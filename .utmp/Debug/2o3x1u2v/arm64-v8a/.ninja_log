@@ -1,0 +1,10 @@
+# ninja log v5
+1	720	1785929531515954378	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	e8416304fa7b2270
+0	725	1785929531522973944	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	48c9e1dae5206793
+0	730	1785929531526991458	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	5ff7e80f9b396975
+1	730	1785929531526243664	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	26b4f4d09a24ed1e
+0	741	1785929531539729086	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	d410fb2dc1577a3a
+1	774	1785929531573367204	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	ebaa4f4b89ca1513
+1	785	1785929531583933616	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	8bd77cfb03257e83
+0	812	1785929531610719294	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	d15f40dd653aaecb
+812	860	1785929531659375465	/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/Debug/2o3x1u2v/obj/arm64-v8a/libgame.so	9bab84fa33f808bb

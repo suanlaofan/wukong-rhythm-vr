@@ -1,0 +1,423 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.XR;
+
+public sealed class WukongStaffController : MonoBehaviour
+{
+    private enum ThrowState
+    {
+        Held,
+        Outbound,
+        Returning
+    }
+
+    public Transform trackingOrigin;
+    public Transform handAnchor;
+    public Camera playerCamera;
+    public Collider staffCollider;
+    public TrailRenderer swingTrail;
+    public AudioClip whooshSound;
+    [Range(0f, 1f)] public float whooshVolume = 0.2f;
+    public float minimumStrikeSpeed = 0.58f;
+    [Tooltip("Extra contact radius to prevent fast swings from skipping between frames.")]
+    public float contactForgiveness = 0.16f;
+    [Header("Throw")]
+    public float maximumThrowDistance = 4.5f;
+    public float outboundDuration = 0.35f;
+    public float returnDuration = 0.35f;
+    public float totalSpinDegrees = 1440f;
+    public Vector3 localLongAxis = Vector3.up;
+
+    private AudioSource audioSource;
+    private UnityEngine.XR.InputDevice rightHandDevice;
+    private Vector3 heldLocalPosition;
+    private Quaternion heldLocalRotation;
+    private Vector3 previousStaffCenter;
+    private Vector3 lastStaffCenter;
+    private Vector3 previousStaffTip;
+    private Vector3 lastStaffTip;
+    private float swingTime = -1f;
+    private float swingSpeed;
+    private float lastAcceptedHitTime;
+    private bool usingXr;
+    private ThrowState throwState;
+    private Transform throwTarget;
+    private Vector3 throwStartPosition;
+    private Vector3 throwDestination;
+    private Vector3 returnStartPosition;
+    private Quaternion throwStartRotation;
+    private float throwStateStarted;
+
+    public float SwingSpeed => swingSpeed;
+    public bool IsThrown => throwState != ThrowState.Held;
+
+    private void Awake()
+    {
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 0.25f;
+        audioSource.volume = Mathf.Clamp01(whooshVolume);
+    }
+
+    private void Start()
+    {
+        if (playerCamera == null)
+        {
+            playerCamera = Camera.main;
+        }
+        heldLocalPosition = transform.localPosition;
+        heldLocalRotation = transform.localRotation;
+        lastStaffCenter = staffCollider != null ? staffCollider.bounds.center : transform.position;
+        lastStaffTip = CalculateStaffTip();
+        previousStaffCenter = lastStaffCenter;
+        previousStaffTip = lastStaffTip;
+        if (swingTrail != null)
+        {
+            swingTrail.emitting = false;
+        }
+    }
+
+    private void Update()
+    {
+        UpdateXrDevice();
+        if (!usingXr)
+        {
+            UpdateDesktopHand();
+        }
+        if (throwState != ThrowState.Held)
+        {
+            UpdateThrow();
+        }
+
+        Vector3 currentCenter = staffCollider != null ? staffCollider.bounds.center : transform.position;
+        Vector3 currentTip = CalculateStaffTip();
+        previousStaffCenter = lastStaffCenter;
+        previousStaffTip = lastStaffTip;
+        float frameDuration = Mathf.Max(0.0001f, Time.deltaTime);
+        float centerSpeed = Vector3.Distance(currentCenter, lastStaffCenter) / frameDuration;
+        float tipSpeed = Vector3.Distance(currentTip, lastStaffTip) / frameDuration;
+        // A wrist rotation can leave the collider center almost stationary while
+        // the striking end of the staff moves quickly. Use the faster point.
+        swingSpeed = Mathf.Max(centerSpeed, tipSpeed);
+        lastStaffCenter = currentCenter;
+        lastStaffTip = currentTip;
+        if (swingTrail != null)
+        {
+            swingTrail.emitting = swingSpeed >= minimumStrikeSpeed * 0.75f || swingTime >= 0f;
+        }
+    }
+
+    private void UpdateXrDevice()
+    {
+        if (!rightHandDevice.isValid)
+        {
+            rightHandDevice = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+        }
+
+        // A simulator can expose a valid device before it exposes pose features.
+        // Treat that state as desktop mode so the fallback swing remains usable.
+        usingXr = false;
+        if (!rightHandDevice.isValid || trackingOrigin == null || handAnchor == null)
+        {
+            return;
+        }
+
+        InputFeatureUsage<Vector3> gripPosition = new InputFeatureUsage<Vector3>("gripPosition");
+        InputFeatureUsage<Quaternion> gripRotation = new InputFeatureUsage<Quaternion>("gripRotation");
+        // Grip pose is the controller's handle pose. Prefer it whenever the
+        // runtime exposes it; device pose is only a compatibility fallback.
+        bool hasPosition = rightHandDevice.TryGetFeatureValue(
+            gripPosition, out Vector3 position)
+            || rightHandDevice.TryGetFeatureValue(
+                UnityEngine.XR.CommonUsages.devicePosition, out position);
+        bool hasRotation = rightHandDevice.TryGetFeatureValue(
+            gripRotation, out Quaternion rotation)
+            || rightHandDevice.TryGetFeatureValue(
+                UnityEngine.XR.CommonUsages.deviceRotation, out rotation);
+        // Some desktop/PICO simulator builds report a valid device with an
+        // all-zero pose until tracking has started. Do not snap the staff to
+        // the rig origin in that state; use the visible desktop fallback below
+        // until a real controller pose arrives.
+        bool validPosition = hasPosition
+            && position.sqrMagnitude > 0.01f
+            && position.sqrMagnitude < 9f
+            && IsFinite(position);
+        bool validRotation = hasRotation
+            && IsFinite(rotation)
+            && Mathf.Abs(Quaternion.Dot(rotation, Quaternion.identity)) < 0.99999f;
+        if (!validPosition || !validRotation)
+        {
+            return;
+        }
+
+        Vector3 worldPosition = trackingOrigin.TransformPoint(position);
+        Quaternion worldRotation = trackingOrigin.rotation * rotation;
+        handAnchor.SetPositionAndRotation(worldPosition, worldRotation);
+        usingXr = true;
+
+    }
+
+    private static bool IsFinite(Vector3 value)
+    {
+        return !float.IsNaN(value.x) && !float.IsNaN(value.y) && !float.IsNaN(value.z)
+            && !float.IsInfinity(value.x) && !float.IsInfinity(value.y) && !float.IsInfinity(value.z);
+    }
+
+    private static bool IsFinite(Quaternion value)
+    {
+        return !float.IsNaN(value.x) && !float.IsNaN(value.y) && !float.IsNaN(value.z) && !float.IsNaN(value.w)
+            && !float.IsInfinity(value.x) && !float.IsInfinity(value.y)
+            && !float.IsInfinity(value.z) && !float.IsInfinity(value.w);
+    }
+
+    private void UpdateDesktopHand()
+    {
+        Vector3 basePosition = handAnchor != null ? handAnchor.position : transform.position;
+        Quaternion baseRotation = handAnchor != null ? handAnchor.rotation : transform.rotation;
+        if (playerCamera != null)
+        {
+            // Keep the fallback staff in the first-person view when the editor or
+            // simulator has no right-hand pose yet. A real XR grip pose always
+            // takes precedence in UpdateXrDevice.
+            basePosition = playerCamera.transform.TransformPoint(new Vector3(0.38f, -0.18f, 0.58f));
+            baseRotation = playerCamera.transform.rotation * Quaternion.Euler(10f, -8f, -18f);
+        }
+
+        bool swingPressed = false;
+        if (Keyboard.current != null)
+        {
+            swingPressed |= Keyboard.current.spaceKey.wasPressedThisFrame;
+        }
+        Vector2 normalizedMouse = Vector2.zero;
+        if (Mouse.current != null)
+        {
+            swingPressed |= Mouse.current.leftButton.wasPressedThisFrame;
+            Vector2 mouse = Mouse.current.position.ReadValue();
+            float width = Mathf.Max(1f, Screen.width);
+            float height = Mathf.Max(1f, Screen.height);
+            normalizedMouse = new Vector2(mouse.x / width, mouse.y / height) - Vector2.one * 0.5f;
+        }
+        if (swingTime < 0f)
+        {
+            Vector3 mouseOffset = playerCamera != null
+                ? playerCamera.transform.right * (normalizedMouse.x * 0.12f)
+                    + playerCamera.transform.up * (normalizedMouse.y * 0.08f)
+                : Vector3.zero;
+            handAnchor.SetPositionAndRotation(
+                basePosition + mouseOffset,
+                baseRotation * Quaternion.Euler(-normalizedMouse.y * 8f, normalizedMouse.x * 12f, -normalizedMouse.x * 8f));
+        }
+
+        if (swingPressed && swingTime < 0f && throwState == ThrowState.Held)
+        {
+            swingTime = 0f;
+            if (whooshSound != null)
+            {
+                audioSource.pitch = Random.Range(0.92f, 1.06f);
+                audioSource.PlayOneShot(whooshSound);
+            }
+        }
+
+        if (swingTime >= 0f && throwState == ThrowState.Held)
+        {
+            swingTime += Time.deltaTime;
+            float duration = 0.28f;
+            float t = Mathf.Clamp01(swingTime / duration);
+            float arc = Mathf.Sin(t * Mathf.PI);
+            float side = Mathf.Lerp(-1f, 1f, t);
+            Vector3 swingOffset = playerCamera != null
+                ? playerCamera.transform.right * (side * 0.16f)
+                    + playerCamera.transform.up * (arc * 0.07f)
+                    + playerCamera.transform.forward * (arc * 0.08f)
+                : new Vector3(side * 0.16f, arc * 0.07f, arc * 0.08f);
+            handAnchor.SetPositionAndRotation(
+                basePosition + swingOffset,
+                baseRotation * Quaternion.Euler(-18f * arc, side * 35f, -side * 22f));
+            if (t >= 1f)
+            {
+                swingTime = -1f;
+                handAnchor.SetPositionAndRotation(basePosition, baseRotation);
+            }
+        }
+    }
+
+    public bool TryStrike(Vector3 worldPoint, float radius)
+    {
+        if (staffCollider == null || Time.time - lastAcceptedHitTime < 0.055f)
+        {
+            return false;
+        }
+        if (throwState == ThrowState.Held && swingSpeed < minimumStrikeSpeed && swingTime < 0f)
+        {
+            return false;
+        }
+
+        float hitRadius = Mathf.Max(0.03f, radius) + Mathf.Max(0f, contactForgiveness);
+        Vector3 closest = staffCollider.ClosestPoint(worldPoint);
+        bool touchingCurrentPose = Vector3.Distance(closest, worldPoint) <= hitRadius;
+        bool crossedBetweenFrames = DistanceToSegment(worldPoint, previousStaffCenter, lastStaffCenter)
+            <= hitRadius + staffCollider.bounds.extents.magnitude * 0.22f
+            || DistanceToSegment(worldPoint, previousStaffTip, lastStaffTip)
+            <= hitRadius + staffCollider.bounds.extents.magnitude * 0.12f;
+        if (!touchingCurrentPose && !crossedBetweenFrames)
+        {
+            return false;
+        }
+
+        lastAcceptedHitTime = Time.time;
+        return true;
+    }
+
+    private Vector3 CalculateStaffTip()
+    {
+        if (staffCollider == null)
+        {
+            return transform.position;
+        }
+
+        UnityEngine.CapsuleCollider capsule = staffCollider as UnityEngine.CapsuleCollider;
+        if (capsule == null)
+        {
+            return staffCollider.bounds.center + staffCollider.transform.forward * staffCollider.bounds.extents.z;
+        }
+
+        Vector3 axis = capsule.direction == 0 ? Vector3.right
+            : capsule.direction == 1 ? Vector3.up
+            : Vector3.forward;
+        float halfSegment = Mathf.Max(0f, capsule.height * 0.5f - capsule.radius);
+        return capsule.transform.TransformPoint(capsule.center + axis * halfSegment);
+    }
+
+    private static float DistanceToSegment(Vector3 point, Vector3 start, Vector3 end)
+    {
+        Vector3 segment = end - start;
+        float lengthSquared = segment.sqrMagnitude;
+        if (lengthSquared < 0.000001f)
+        {
+            return Vector3.Distance(point, start);
+        }
+
+        float t = Mathf.Clamp01(Vector3.Dot(point - start, segment) / lengthSquared);
+        return Vector3.Distance(point, Vector3.Lerp(start, end, t));
+    }
+
+    public void ConfirmHit(float strength)
+    {
+        if (!rightHandDevice.isValid)
+        {
+            return;
+        }
+
+        rightHandDevice.SendHapticImpulse(0u, Mathf.Clamp01(strength), 0.075f);
+    }
+
+    public bool BeginThrow(Transform target)
+    {
+        if (throwState != ThrowState.Held || handAnchor == null)
+        {
+            return false;
+        }
+
+        throwTarget = target;
+        throwStartPosition = transform.position;
+        throwStartRotation = transform.rotation;
+        throwDestination = ResolveThrowDestination(target);
+        throwStateStarted = Time.unscaledTime;
+        throwState = ThrowState.Outbound;
+        swingTime = -1f;
+        transform.SetParent(null, true);
+        if (swingTrail != null)
+        {
+            swingTrail.emitting = true;
+        }
+        SendHaptic(0.28f, 0.045f);
+        return true;
+    }
+
+    public void CancelThrowAndReattach()
+    {
+        throwState = ThrowState.Held;
+        throwTarget = null;
+        if (handAnchor != null)
+        {
+            transform.SetParent(handAnchor, false);
+            transform.localPosition = heldLocalPosition;
+            transform.localRotation = heldLocalRotation;
+        }
+        if (swingTrail != null)
+        {
+            swingTrail.emitting = false;
+        }
+    }
+
+    private void UpdateThrow()
+    {
+        if (throwState == ThrowState.Outbound)
+        {
+            float t = Mathf.Clamp01((Time.unscaledTime - throwStateStarted) / Mathf.Max(0.1f, outboundDuration));
+            if (throwTarget != null)
+            {
+                throwDestination = ResolveThrowDestination(throwTarget);
+            }
+            Vector3 control = Vector3.Lerp(throwStartPosition, throwDestination, 0.5f)
+                + (playerCamera != null ? playerCamera.transform.up : Vector3.up) * 0.34f;
+            transform.position = QuadraticBezier(throwStartPosition, control, throwDestination, Mathf.SmoothStep(0f, 1f, t));
+            transform.rotation = throwStartRotation * Quaternion.AngleAxis(totalSpinDegrees * 0.5f * t, SafeLongAxis());
+            if (t >= 1f)
+            {
+                returnStartPosition = transform.position;
+                throwStartRotation = transform.rotation;
+                throwStateStarted = Time.unscaledTime;
+                throwState = ThrowState.Returning;
+            }
+        }
+        else if (throwState == ThrowState.Returning)
+        {
+            float t = Mathf.Clamp01((Time.unscaledTime - throwStateStarted) / Mathf.Max(0.1f, returnDuration));
+            Vector3 handPosition = handAnchor != null
+                ? handAnchor.TransformPoint(heldLocalPosition)
+                : returnStartPosition;
+            Vector3 control = Vector3.Lerp(returnStartPosition, handPosition, 0.5f)
+                + (playerCamera != null ? playerCamera.transform.up : Vector3.up) * 0.22f;
+            transform.position = QuadraticBezier(returnStartPosition, control, handPosition, Mathf.SmoothStep(0f, 1f, t));
+            transform.rotation = throwStartRotation * Quaternion.AngleAxis(totalSpinDegrees * 0.5f * t, SafeLongAxis());
+            if (t >= 1f || Vector3.Distance(transform.position, handPosition) < 0.035f)
+            {
+                CancelThrowAndReattach();
+                SendHaptic(0.18f, 0.04f);
+            }
+        }
+    }
+
+    private Vector3 ResolveThrowDestination(Transform target)
+    {
+        Vector3 desired = target != null
+            ? target.position
+            : throwStartPosition + (playerCamera != null ? playerCamera.transform.forward : transform.forward) * maximumThrowDistance;
+        Vector3 offset = desired - throwStartPosition;
+        if (offset.sqrMagnitude > maximumThrowDistance * maximumThrowDistance)
+        {
+            desired = throwStartPosition + offset.normalized * maximumThrowDistance;
+        }
+        return desired;
+    }
+
+    private Vector3 SafeLongAxis()
+    {
+        return localLongAxis.sqrMagnitude > 0.001f ? localLongAxis.normalized : Vector3.up;
+    }
+
+    private static Vector3 QuadraticBezier(Vector3 a, Vector3 b, Vector3 c, float t)
+    {
+        float inverse = 1f - t;
+        return inverse * inverse * a + 2f * inverse * t * b + t * t * c;
+    }
+
+    private void SendHaptic(float amplitude, float duration)
+    {
+        if (rightHandDevice.isValid)
+        {
+            rightHandDevice.SendHapticImpulse(0u, Mathf.Clamp01(amplitude), Mathf.Max(0.01f, duration));
+        }
+    }
+}

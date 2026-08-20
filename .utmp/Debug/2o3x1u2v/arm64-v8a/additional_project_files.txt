@@ -1,0 +1,17 @@
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/GAToUnityCallbacks.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/MacroEnd.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/MacroHeaderBegin.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/MacroSourceBegin.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGAApplication.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGAConfiguration.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGADebug.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGAEvents.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGAInput.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGASoftKeyboard.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGASoftKeyboardCallbacks.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGATypes.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGAVersion.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UnityToGACallbacks.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UnityToGAConfigurationCallbacks.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UnityToGAKeyEventCallbacks.h
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UnityToGAMotionEventCallbacks.h

@@ -1,0 +1,5 @@
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/.utmp/Debug/2f13311y/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/.utmp/Debug/2f13311y/arm64-v8a/CMakeFiles/rebuild_cache.dir
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/.utmp/Debug/2f13311y/arm64-v8a/GameActivity/CMakeFiles/game.dir
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/.utmp/Debug/2f13311y/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR/.utmp/Debug/2f13311y/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir

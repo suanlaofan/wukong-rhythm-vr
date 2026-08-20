@@ -1,0 +1,25 @@
+# Unity generated state
+[Ll]ibrary/
+[Tt]emp/
+[Ll]ogs/
+[Oo]bj/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# Build outputs and release assets
+[Bb]uilds/
+[Bb]uild/
+
+# IDE and OS metadata
+.vs/
+.vscode/
+*.csproj
+*.sln
+*.user
+*.userprefs
+*.pidb
+*.pdb
+*.opendb
+*.VC.db
+.DS_Store

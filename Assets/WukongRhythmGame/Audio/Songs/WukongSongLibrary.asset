@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3cd11f33ed6546d7b4cbf8e66b5ba5f, type: 3}
+  m_Name: WukongSongLibrary
+  m_EditorClassIdentifier: Assembly-CSharp::WukongSongLibrary
+  songs:
+  - {fileID: 11400000, guid: 33b77e2c41664499bbd6a9975ba1a3b4, type: 2}
+  - {fileID: 11400000, guid: 263484d054b234286825d76e80b60bff, type: 2}
+  - {fileID: 11400000, guid: 60f27f9d7a0ea445a8aae2587c882451, type: 2}
+  - {fileID: 11400000, guid: 5ec4d3bde85fe4a4894f35c510bf6abf, type: 2}
+  - {fileID: 11400000, guid: 486e82e4442f24e7f87b8acf8c1b98b7, type: 2}
+  - {fileID: 11400000, guid: 38e9573f5a86a4bc8a2b150e50adb716, type: 2}
+  - {fileID: 11400000, guid: e237875041cae421c9be2b1aa4f3ea43, type: 2}
+  - {fileID: 11400000, guid: ecfcc931715a640bf9472923df060c37, type: 2}
+  - {fileID: 11400000, guid: 978f810c10aa34c0e929772e273a03f1, type: 2}
+  - {fileID: 11400000, guid: 8e25995c9234d42ac992aae10655b883, type: 2}
+  - {fileID: 11400000, guid: 0ced67a4184594ffdb0f258a3debcecb, type: 2}
+  - {fileID: 11400000, guid: ecfce419caf4445a1868824af884bd09, type: 2}
+  - {fileID: 11400000, guid: c78305d28860643e1bbcd3f4f78454ef, type: 2}
+  - {fileID: 11400000, guid: 2a88c49addd0f49c2b9c052a98307bfd, type: 2}
+  - {fileID: 11400000, guid: 4aa983543e2fd475c86909ef82b16801, type: 2}
+  - {fileID: 11400000, guid: e7c7bda6561d545b686b476822dab331, type: 2}
+  - {fileID: 11400000, guid: 85c00f373e59f4211907cb6a896045a2, type: 2}
+  - {fileID: 11400000, guid: 0a4e0268e205145759f13a35c395dfe8, type: 2}
+  - {fileID: 11400000, guid: c43551c2d801545028f9a8080fb51ed8, type: 2}
+  - {fileID: 11400000, guid: ba2cddb1ad16145d89c02bcc677071da, type: 2}
+  - {fileID: 11400000, guid: 01b0aa62d56c545bd834870b9f6815d5, type: 2}
