@@ -14,6 +14,8 @@ public sealed class WukongSpatialUi : MonoBehaviour
     public bool initializePosition = false;
     public bool followPosition = false;
     public bool faceCamera = true;
+    [Tooltip("Keep the panel parallel to the player's view so offset HUD text stays horizontal.")]
+    public bool alignWithView = false;
 
     private bool positionInitialized;
 
@@ -58,6 +60,11 @@ public sealed class WukongSpatialUi : MonoBehaviour
 
         if (faceCamera && positionInitialized)
         {
+            if (alignWithView)
+            {
+                transform.rotation = targetCamera.transform.rotation;
+                return;
+            }
             Vector3 toCamera = targetCamera.transform.position - transform.position;
             if (toCamera.sqrMagnitude > 0.000001f)
             {
@@ -80,6 +87,11 @@ public sealed class WukongSpatialUi : MonoBehaviour
     private void PlaceRelativeToCamera()
     {
         Transform cameraTransform = targetCamera.transform;
+        if (alignWithView)
+        {
+            transform.position = cameraTransform.position + cameraTransform.rotation * headRelativeOffset;
+            return;
+        }
         Vector3 horizontalForward = Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up);
         if (horizontalForward.sqrMagnitude < 0.000001f)
         {

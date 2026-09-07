@@ -1,77 +1,93 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>Persistent controls outside the right-hand score panel.</summary>
+/// <summary>A small, state-specific row of controls above the play area.</summary>
 public sealed class WukongControlsGuide : MonoBehaviour
 {
+    public static readonly Vector2 ReferenceSize = new Vector2(1040f, 36f);
+    public static readonly Vector3 XrOffset = new Vector3(0f, .92f, 1.95f);
+    public const float PixelsToMeters = .00125f;
+
     public WukongRhythmGame game;
-    public Text titleLabel;
     public Text bindingsLabel;
     public RectTransform contentRoot;
-    private int previousState=-1;
+    private int previousState = -1;
+    private int previousOffset = int.MinValue;
     private bool previousChinese, previousXr;
 
     private void LateUpdate()
     {
-        if (game==null || game.hud==null) return;
-        bool chinese=game.hud.IsChinese, xr=UnityEngine.XR.XRSettings.isDeviceActive;
-        if(previousState<0 || xr!=previousXr) ConfigurePresentation(xr);
-        if(previousState==(int)game.State && chinese==previousChinese && xr==previousXr)return;
-        previousState=(int)game.State;previousChinese=chinese;previousXr=xr;
-        if(titleLabel!=null)titleLabel.text=chinese?(xr?"操作提示 · 手柄":"操作提示 · 键盘与鼠标"):(xr?"CONTROLS · VR":"CONTROLS · KEYBOARD & MOUSE");
-        if(bindingsLabel!=null)bindingsLabel.text=Bindings(game.State,xr,chinese);
+        if (game == null || game.hud == null) return;
+        bool chinese = game.hud.IsChinese;
+        bool xr = UnityEngine.XR.XRSettings.isDeviceActive;
+        int offset = Mathf.RoundToInt(game.inputTimingOffsetSeconds * 1000f);
+        if (previousState < 0 || xr != previousXr) ConfigurePresentation(xr);
+        if (previousState == (int)game.State && chinese == previousChinese && xr == previousXr && offset == previousOffset) return;
+        previousState = (int)game.State;
+        previousChinese = chinese;
+        previousXr = xr;
+        previousOffset = offset;
+        if (bindingsLabel != null)
+        {
+            bindingsLabel.text = Bindings(game.State, xr, chinese);
+            if (game.State == WukongRhythmGame.BattleState.Paused)
+                bindingsLabel.text += " " + offset.ToString("+0;-0;0") + " ms";
+        }
     }
 
     private void ConfigurePresentation(bool xr)
     {
-        var canvas=GetComponent<Canvas>();
-        var scaler=GetComponent<CanvasScaler>();
-        var spatial=GetComponent<WukongSpatialUi>();
-        if(canvas==null || contentRoot==null)return;
-        // Desktop guidance belongs on the screen so the courtyard cannot occlude
-        // it. Headsets retain a world-space panel in front of the tracked player.
-        if(spatial!=null)spatial.enabled=xr;
-        canvas.renderMode=xr?RenderMode.WorldSpace:RenderMode.ScreenSpaceOverlay;
-        if(scaler!=null)
+        var canvas = GetComponent<Canvas>();
+        var scaler = GetComponent<CanvasScaler>();
+        var spatial = GetComponent<WukongSpatialUi>();
+        if (canvas == null || contentRoot == null) return;
+        // Desktop text stays clear of scene geometry; headsets use spatial text.
+        if (spatial != null) spatial.enabled = xr;
+        canvas.renderMode = xr ? RenderMode.WorldSpace : RenderMode.ScreenSpaceOverlay;
+        if (scaler != null)
         {
-            scaler.uiScaleMode=xr?CanvasScaler.ScaleMode.ConstantPixelSize:CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution=new Vector2(1920,1080);
-            scaler.screenMatchMode=CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            scaler.matchWidthOrHeight=.5f;
+            scaler.uiScaleMode = xr ? CanvasScaler.ScaleMode.ConstantPixelSize : CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+            scaler.matchWidthOrHeight = .5f;
         }
-        contentRoot.anchorMin=contentRoot.anchorMax=contentRoot.pivot=xr?new Vector2(.5f,.5f):new Vector2(.5f,0f);
-        contentRoot.sizeDelta=new Vector2(1500,190);
-        contentRoot.anchoredPosition=xr?Vector2.zero:new Vector2(0,24);
-        if(xr)
+        contentRoot.anchorMin = contentRoot.anchorMax = contentRoot.pivot = xr ? new Vector2(.5f, .5f) : new Vector2(.5f, 1f);
+        contentRoot.sizeDelta = ReferenceSize;
+        // Leave a safe inset, including when the Editor Game View is zoomed slightly.
+        contentRoot.anchoredPosition = xr ? Vector2.zero : new Vector2(0, -72);
+        if (xr)
         {
-            var root=(RectTransform)transform;
-            root.sizeDelta=new Vector2(1500,190);
-            root.localScale=Vector3.one*.00115f;
+            var root = (RectTransform)transform;
+            root.sizeDelta = ReferenceSize;
+            root.localScale = Vector3.one * PixelsToMeters;
         }
     }
 
-    public static string Bindings(WukongRhythmGame.BattleState state,bool xr,bool zh)
+    public static string Bindings(WukongRhythmGame.BattleState state, bool xr, bool zh)
     {
-        if(state==WukongRhythmGame.BattleState.SongSelect)
-            return xr
-                ?(zh?"右摇杆 ↑/↓ 选曲   A 开始   X 中英切换\n游戏中：移动右手挥棒   A 投掷   B 暂停":"RIGHT STICK ↑/↓ SELECT   A START   X LANGUAGE\nIN GAME: MOVE RIGHT HAND TO STRIKE   A THROW   B PAUSE")
-                :(zh?"↑ / ↓ 选曲   Enter / T 开始   L 中英切换\n游戏中：鼠标移棒   左键 / 空格挥棒   T 投掷   Esc 暂停":"↑ / ↓ SELECT   ENTER / T START   L LANGUAGE\nIN GAME: MOUSE MOVE   CLICK / SPACE STRIKE   T THROW   ESC PAUSE");
-        if(state==WukongRhythmGame.BattleState.Paused)
-            return xr
-                ?(zh?"A 继续   长按 B 返回选曲   X 中英切换\n右摇杆 ←/→ 调整时间补偿 · 每次 10 ms":"A RESUME   HOLD B MUSIC   X LANGUAGE\nRIGHT STICK ←/→ TIMING OFFSET · 10 ms PER STEP")
-                :(zh?"Enter / T 继续   长按 Esc 返回选曲   L 中英切换\n← / → 调整时间补偿 · 每次 10 ms":"ENTER / T RESUME   HOLD ESC MUSIC   L LANGUAGE\n← / → TIMING OFFSET · 10 ms PER STEP");
-        if(state==WukongRhythmGame.BattleState.Results)
-            return xr
-                ?(zh?"A 再玩一局   B 返回选曲   X 中英切换\n合圈时挥棒，或踩拍投掷，可获得节奏得分":"A REPLAY   B SELECT MUSIC   X LANGUAGE\nSTRIKE OR RELEASE YOUR THROW ON THE BEAT TO SCORE")
-                :(zh?"Enter / T / R 再玩一局   Esc 返回选曲   L 中英切换\n合圈时挥棒，或踩拍投掷，可获得节奏得分":"ENTER / T / R REPLAY   ESC SELECT MUSIC   L LANGUAGE\nSTRIKE OR RELEASE YOUR THROW ON THE BEAT TO SCORE");
-        if(state==WukongRhythmGame.BattleState.CountIn || state==WukongRhythmGame.BattleState.Resuming)
-            return xr
-                ?(zh?"请等待倒计时结束   X 中英切换\n游戏开始后：移动右手挥棒   A 投掷   B 暂停":"WAIT FOR THE COUNT-IN   X LANGUAGE\nAFTER COUNT-IN: MOVE RIGHT HAND TO STRIKE   A THROW   B PAUSE")
-                :(zh?"请等待倒计时结束   L 中英切换\n游戏开始后：鼠标移棒   左键 / 空格挥棒   T 投掷   Esc 暂停":"WAIT FOR THE COUNT-IN   L LANGUAGE\nAFTER COUNT-IN: MOUSE MOVE   CLICK / SPACE STRIKE   T THROW   ESC PAUSE");
-        if(state==WukongRhythmGame.BattleState.Ending)
-            return zh?(xr?"曲目结束，正在结算 · X 中英切换":"曲目结束，正在结算 · L 中英切换"):(xr?"TRACK COMPLETE · PREPARING RESULTS · X LANGUAGE":"TRACK COMPLETE · PREPARING RESULTS · L LANGUAGE");
-        return xr
-            ?(zh?"移动右手 挥棒   A 投掷   B 暂停   X 中英切换\n长按 B 返回选曲 · 合圈时挥棒或出手投掷得分":"MOVE RIGHT HAND TO STRIKE   A THROW   B PAUSE   X LANGUAGE\nHOLD B MUSIC · STRIKE OR RELEASE YOUR THROW ON THE BEAT TO SCORE")
-            :(zh?"鼠标 移棒   左键 / 空格 挥棒   T / Enter 投掷\nEsc / P 暂停   长按 Esc 选曲   L 中英切换 · 合圈时出手得分":"MOUSE MOVE   CLICK / SPACE STRIKE   T / ENTER THROW\nESC / P PAUSE   HOLD ESC MUSIC   L LANGUAGE · RELEASE ON THE BEAT TO SCORE");
+        switch (state)
+        {
+            case WukongRhythmGame.BattleState.SongSelect:
+                return xr
+                    ? (zh ? "右摇杆选曲   A 开始   X 中英" : "STICK SELECT   A START   X LANGUAGE")
+                    : (zh ? "↑↓ 选曲   Enter 开始   L 中英" : "↑↓ SELECT   ENTER START   L LANGUAGE");
+            case WukongRhythmGame.BattleState.Paused:
+                return xr
+                    ? (zh ? "A 继续   长按 B 选曲   摇杆 ←→ 校准" : "A RESUME   HOLD B MUSIC   STICK ←→ CALIBRATE")
+                    : (zh ? "Enter 继续   长按 Esc 选曲   ←→ 校准" : "ENTER RESUME   HOLD ESC MUSIC   ←→ CALIBRATE");
+            case WukongRhythmGame.BattleState.Results:
+                return xr
+                    ? (zh ? "A 重玩   B 选曲   X 中英" : "A REPLAY   B MUSIC   X LANGUAGE")
+                    : (zh ? "R 重玩   Esc 选曲   L 中英" : "R REPLAY   ESC MUSIC   L LANGUAGE");
+            case WukongRhythmGame.BattleState.CountIn:
+            case WukongRhythmGame.BattleState.Resuming:
+                return zh ? "跟随倒计时，准备出手" : "FOLLOW THE COUNT-IN · GET READY";
+            case WukongRhythmGame.BattleState.Ending:
+                return zh ? "曲目结束，正在结算" : "TRACK COMPLETE · RESULTS COMING";
+            default:
+                return xr
+                    ? (zh ? "挥动右手击打   A 投掷   B 暂停" : "SWING TO STRIKE   A THROW   B PAUSE")
+                    : (zh ? "鼠标移棒   左键/空格击打   T 投掷   Esc 暂停" : "MOUSE MOVE   CLICK/SPACE STRIKE   T THROW   ESC PAUSE");
+        }
     }
 }
