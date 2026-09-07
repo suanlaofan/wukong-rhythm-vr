@@ -15,7 +15,7 @@ public struct WukongBeatNote
     [Min(0f)] public float beat;
     [Range(-1, 1)] public int lane;
     public WukongBeatNoteType type;
-    [Min(2f)] public float warningBeats;
+    [Min(1f)] public float warningBeats;
     [Range(0.25f, 2f)] public float strength;
 
     [Tooltip("Per-note seconds correction for a detected or manually reviewed musical attack.")]
@@ -54,6 +54,8 @@ public sealed class WukongSongDefinition : ScriptableObject
     public bool lockBeatmap;
     public bool auditoryReviewed;
     public string chartProvenance;
+    [Tooltip("Detected musical beat positions in clip seconds. Shared by notes, spawning, warnings and HUD; supports tempo drift.")]
+    public List<float> beatTimesSeconds = new List<float>();
     public List<WukongBeatNote> notes = new List<WukongBeatNote>();
 
     public float Duration => audioClip != null ? audioClip.length : 0f;
@@ -61,8 +63,27 @@ public sealed class WukongSongDefinition : ScriptableObject
 
     public float TimeAtBeat(float beat)
     {
-        return beatOffsetSeconds + Mathf.Max(0f, beat) * BeatDuration;
+        if (beatTimesSeconds == null || beatTimesSeconds.Count < 2)
+            return beatOffsetSeconds + beat * BeatDuration;
+        int index = Mathf.Clamp(Mathf.FloorToInt(beat), 0, beatTimesSeconds.Count - 2);
+        return Mathf.LerpUnclamped(beatTimesSeconds[index], beatTimesSeconds[index + 1], beat - index);
     }
+
+    public float BeatAtTime(float seconds)
+    {
+        if (beatTimesSeconds == null || beatTimesSeconds.Count < 2)
+            return (seconds - beatOffsetSeconds) / BeatDuration;
+        int low = 0, high = beatTimesSeconds.Count - 1;
+        while (low + 1 < high)
+        {
+            int middle = (low + high) / 2;
+            if (beatTimesSeconds[middle] <= seconds) low = middle; else high = middle;
+        }
+        return low + (seconds - beatTimesSeconds[low]) / Mathf.Max(.001f, beatTimesSeconds[low + 1] - beatTimesSeconds[low]);
+    }
+
+    public float SpawnTimeAtNote(WukongBeatNote note) => TimeAtBeat(note.beat - travelBeats);
+    public float WarningTimeAtNote(WukongBeatNote note) => TimeAtBeat(note.beat - note.warningBeats);
 
     public float TimeAtNote(WukongBeatNote note) => TimeAtBeat(note.beat) + note.timingOffsetSeconds;
 

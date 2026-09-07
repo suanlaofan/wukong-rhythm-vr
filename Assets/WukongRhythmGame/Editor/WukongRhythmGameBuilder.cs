@@ -140,9 +140,10 @@ public static class WukongRhythmGameBuilder
         GameObject rockTemplate = BuildRockTemplate(root.transform, rockMaterial, trailMaterial);
 
         WukongRhythmGame game = root.AddComponent<WukongRhythmGame>();
-        game.rockShatterSound = LoadAudio("Rock_Shatter.mp3");
-        game.fireImpactSound = LoadAudio("Fire_Impact.mp3");
-        game.staffImpactSound = LoadAudio("Staff_Impact.mp3");
+        game.rockShatterSound = LoadAudio("Gameplay/Rock_Shatter_Short.wav");
+        game.fireImpactSound = LoadAudio("Gameplay/Fire_Impact_Short.wav");
+        game.staffImpactSound = LoadAudio("Gameplay/Staff_Impact_Short.wav");
+        game.effectsVolume = 0.7f;
         game.victorySound = LoadAudio("Victory_Chime.mp3");
         game.rockMaterial = rockMaterial;
         game.particleMaterial = particleMaterial;
@@ -484,8 +485,8 @@ public static class WukongRhythmGameBuilder
         controller.playerCamera = camera;
         controller.staffCollider = capsule;
         controller.swingTrail = trail;
-        controller.whooshSound = AssetDatabase.LoadAssetAtPath<AudioClip>(AudioRoot + "/Staff_Whoosh.wav");
-        controller.whooshVolume = 0.2f;
+        controller.whooshSound = AssetDatabase.LoadAssetAtPath<AudioClip>(AudioRoot + "/Gameplay/Staff_Whoosh_Short.wav");
+        controller.whooshVolume = 0.35f;
         controller.minimumStrikeSpeed = 0.58f;
         controller.contactForgiveness = 0.16f;
         controller.maximumThrowDistance = 4.5f;

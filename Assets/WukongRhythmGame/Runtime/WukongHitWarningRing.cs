@@ -5,7 +5,7 @@ public sealed class WukongHitWarningRing : MonoBehaviour
     private const int SegmentCount = 40;
     private WukongRhythmGame game;
     private LineRenderer targetRing, approachRing;
-    private float targetSongTime, warningBeats, resolveStarted;
+    private float targetSongTime, warningStartSongTime, resolveStarted;
     private bool resolved, powerful;
     private Color resolveColor;
 
@@ -15,17 +15,18 @@ public sealed class WukongHitWarningRing : MonoBehaviour
         root.transform.SetParent(owner.transform, false);
         WukongHitWarningRing ring = root.AddComponent<WukongHitWarningRing>();
         ring.game = owner;
-        ring.targetRing = ring.CreateLine("Hit Circle", 0.016f);
-        ring.approachRing = ring.CreateLine("Approach Circle", 0.012f);
+        ring.targetRing = ring.CreateLine("Hit Circle", 0.009f);
+        ring.approachRing = ring.CreateLine("Approach Circle", 0.016f);
         root.SetActive(false);
         return ring;
     }
 
-    public void Initialize(WukongRhythmGame owner, Vector3 position, float targetTime, float warningBeatCount, bool strong)
+    public void Initialize(WukongRhythmGame owner, Vector3 position, float targetTime, float warningStartTime, bool strong)
     {
-        game = owner; targetSongTime = targetTime; warningBeats = Mathf.Clamp(warningBeatCount, 1f, 1.5f); powerful = strong;
+        game = owner; targetSongTime = targetTime; warningStartSongTime = warningStartTime; powerful = strong;
         resolved = false;
         transform.SetPositionAndRotation(position, owner.ArenaRotation);
+        // Visual styling stays compact and independent of the forgiving hit volume.
         transform.localScale = Vector3.one;
         gameObject.SetActive(true);
         UpdateVisual();
@@ -47,22 +48,22 @@ public sealed class WukongHitWarningRing : MonoBehaviour
 
     private void UpdateVisual()
     {
-        float remaining = (targetSongTime - game.SongTime) * game.CurrentBpm / 60f;
-        bool visible = remaining <= warningBeats;
+        bool visible = game.SongTime >= warningStartSongTime;
         targetRing.enabled = visible; approachRing.enabled = visible;
         if (!visible) return;
-        float progress = Mathf.Clamp01(1f - remaining / warningBeats);
+        float progress = ApproachProgress(game.SongTime, warningStartSongTime, targetSongTime);
         // Only the moving circle shrinks. At the authored target time it meets
         // the fixed circle, whose radius is a stable spatial reference.
-        approachRing.transform.localScale = Vector3.one * Mathf.Lerp(1.7f, 1f, progress);
-        float beatPhase = Mathf.Repeat(game.CurrentBeat, 1f);
-        float accent = 1f - Mathf.Clamp01(beatPhase / 0.22f);
-        Color color = powerful ? new Color(1f, 0.64f, 0.16f) : new Color(0.36f, 0.92f, 1f);
-        color.a = Mathf.Lerp(0.08f, 0.80f, progress);
+        approachRing.transform.localScale = Vector3.one * Mathf.Lerp(1.32f, 1f, progress);
+        Color color = new Color(0.36f, 0.92f, 1f);
+        color.a = Mathf.Lerp(0.18f, 0.8f, progress);
         SetColor(approachRing, color);
-        color.a *= 0.65f + accent * 0.25f;
+        color.a = Mathf.Lerp(0.14f, 0.55f, progress);
         SetColor(targetRing, color);
     }
+
+    public static float ApproachProgress(float time, float start, float target)
+        => Mathf.Clamp01((time - start) / Mathf.Max(.001f, target - start));
 
     public void CompleteHit(bool perfect)
     {
@@ -84,7 +85,7 @@ public sealed class WukongHitWarningRing : MonoBehaviour
         for (int i = 0; i < SegmentCount; i++)
         {
             float a = i * Mathf.PI * 2f / SegmentCount;
-            line.SetPosition(i, new Vector3(Mathf.Cos(a), Mathf.Sin(a), 0) * 0.28f);
+            line.SetPosition(i, new Vector3(Mathf.Cos(a), Mathf.Sin(a), 0) * .28f);
         }
         return line;
     }

@@ -22,6 +22,9 @@ public sealed class WukongStaffController : MonoBehaviour
     public float minimumStrikeSpeed = 0.58f;
     [Tooltip("Extra contact radius to prevent fast swings from skipping between frames.")]
     public float contactForgiveness = 0.16f;
+    [Header("Desktop Mouse")]
+    [Tooltip("Distance of the mouse aim plane from the camera. The striking tip follows the cursor on this plane.")]
+    [Range(.5f, 3f)] public float desktopAimDistance = 1.8f;
     [Header("Throw")]
     public float maximumThrowDistance = 4.5f;
     public float outboundDuration = 0.35f;
@@ -37,6 +40,7 @@ public sealed class WukongStaffController : MonoBehaviour
     private Vector3 lastStaffCenter;
     private Vector3 previousStaffTip;
     private Vector3 lastStaffTip;
+    private Vector3 previousStaffBase, lastStaffBase;
     private float swingTime = -1f;
     private float swingSpeed;
     private double previousSampleDsp;
@@ -70,6 +74,8 @@ public sealed class WukongStaffController : MonoBehaviour
         audioSource.playOnAwake = false;
         audioSource.spatialBlend = 0.25f;
         audioSource.volume = Mathf.Clamp01(whooshVolume);
+        audioSource.priority = 100;
+        if (whooshSound != null) whooshSound.LoadAudioData();
     }
 
     private void Start()
@@ -80,8 +86,9 @@ public sealed class WukongStaffController : MonoBehaviour
         }
         heldLocalPosition = transform.localPosition;
         heldLocalRotation = transform.localRotation;
-        lastStaffCenter = staffCollider != null ? staffCollider.bounds.center : transform.position;
+        lastStaffCenter = CalculateStaffCenter();
         lastStaffTip = CalculateStaffTip();
+        previousStaffBase = lastStaffBase = lastStaffCenter * 2f - lastStaffTip;
         previousStaffCenter = lastStaffCenter;
         previousStaffTip = lastStaffTip;
         sampleDsp = previousSampleDsp = AudioSettings.dspTime;
@@ -111,8 +118,10 @@ public sealed class WukongStaffController : MonoBehaviour
             UpdateThrow();
         }
 
-        Vector3 currentCenter = staffCollider != null ? staffCollider.bounds.center : transform.position;
+        Vector3 currentCenter = CalculateStaffCenter();
         Vector3 currentTip = CalculateStaffTip();
+        previousStaffBase = lastStaffBase;
+        lastStaffBase = currentCenter * 2f - currentTip;
         previousStaffCenter = lastStaffCenter;
         previousStaffTip = lastStaffTip;
         previousSampleDsp = sampleDsp;
@@ -125,10 +134,14 @@ public sealed class WukongStaffController : MonoBehaviour
         swingSpeed = Mathf.Max(centerSpeed, tipSpeed);
         Vector3 motion = currentTip - lastStaffTip;
         bool moving = swingSpeed >= minimumStrikeSpeed || swingTime >= 0f || IsThrown;
-        bool reversed = !IsThrown && motion.sqrMagnitude > 0.00001f && previousMotion.sqrMagnitude > 0.00001f
+        bool reversed = swingTime < 0f && !IsThrown && motion.sqrMagnitude > 0.00001f && previousMotion.sqrMagnitude > 0.00001f
             && Vector3.Dot(motion.normalized, previousMotion.normalized) < -0.2f
             && sampleDsp - swingStartedDsp > 0.10;
-        if (moving && (!swingActive || reversed)) { swingId++; swingStartedDsp = sampleDsp; }
+        if (moving && (!swingActive || reversed))
+        {
+            swingId++; swingStartedDsp = sampleDsp;
+            if (usingXr) PlayWhoosh();
+        }
         swingActive = moving;
         previousMotion = motion;
         lastStaffCenter = currentCenter;
@@ -170,13 +183,12 @@ public sealed class WukongStaffController : MonoBehaviour
         // all-zero pose until tracking has started. Do not snap the staff to
         // the rig origin in that state; use the visible desktop fallback below
         // until a real controller pose arrives.
-        bool validPosition = hasPosition
-            && position.sqrMagnitude > 0.01f
-            && position.sqrMagnitude < 9f
-            && IsFinite(position);
+        bool reportsTracking = rightHandDevice.TryGetFeatureValue(UnityEngine.XR.CommonUsages.isTracked, out bool tracked);
+        bool validPosition = hasPosition && IsFinite(position)
+            && (reportsTracking ? tracked : position.sqrMagnitude > .0001f);
         bool validRotation = hasRotation && IsFinite(rotation)
             && Quaternion.Dot(rotation, rotation) > 0.5f;
-        if (rightHandDevice.TryGetFeatureValue(UnityEngine.XR.CommonUsages.isTracked, out bool tracked) && !tracked) return;
+        if (reportsTracking && !tracked) return;
         if (!validPosition || !validRotation)
         {
             return;
@@ -204,50 +216,33 @@ public sealed class WukongStaffController : MonoBehaviour
 
     private void UpdateDesktopHand()
     {
-        Vector3 basePosition = handAnchor != null ? handAnchor.position : transform.position;
-        Quaternion baseRotation = handAnchor != null ? handAnchor.rotation : transform.rotation;
-        if (playerCamera != null)
-        {
-            // Keep the fallback staff in the first-person view when the editor or
-            // simulator has no right-hand pose yet. A real XR grip pose always
-            // takes precedence in UpdateXrDevice.
-            basePosition = playerCamera.transform.TransformPoint(new Vector3(0.38f, -0.18f, 0.58f));
-            baseRotation = playerCamera.transform.rotation * Quaternion.Euler(10f, -8f, -18f);
-        }
+        if (handAnchor == null || playerCamera == null) return;
+        Quaternion baseRotation = playerCamera.transform.rotation * Quaternion.Euler(10f, -8f, -18f);
 
         bool swingPressed = false;
         if (Keyboard.current != null)
         {
             swingPressed |= Keyboard.current.spaceKey.wasPressedThisFrame;
         }
-        Vector2 normalizedMouse = Vector2.zero;
+        Vector2 viewport = new Vector2(.5f, .5f);
         if (Mouse.current != null)
         {
             swingPressed |= Mouse.current.leftButton.wasPressedThisFrame;
             Vector2 mouse = Mouse.current.position.ReadValue();
-            float width = Mathf.Max(1f, Screen.width);
-            float height = Mathf.Max(1f, Screen.height);
-            normalizedMouse = new Vector2(mouse.x / width, mouse.y / height) - Vector2.one * 0.5f;
+            Rect pixels = playerCamera.pixelRect;
+            viewport = new Vector2(Mathf.Clamp01((mouse.x-pixels.x)/Mathf.Max(1f,pixels.width)),
+                Mathf.Clamp01((mouse.y-pixels.y)/Mathf.Max(1f,pixels.height)));
         }
-        if (swingTime < 0f)
-        {
-            Vector3 mouseOffset = playerCamera != null
-                ? playerCamera.transform.right * (normalizedMouse.x * 0.12f)
-                    + playerCamera.transform.up * (normalizedMouse.y * 0.08f)
-                : Vector3.zero;
-            handAnchor.SetPositionAndRotation(
-                basePosition + mouseOffset,
-                baseRotation * Quaternion.Euler(-normalizedMouse.y * 8f, normalizedMouse.x * 12f, -normalizedMouse.x * 8f));
-        }
+        Vector3 aimPoint = playerCamera.ViewportToWorldPoint(new Vector3(viewport.x, viewport.y, desktopAimDistance));
+        Vector3 tipInHand = HeldTipInHand();
 
         if (swingPressed && swingTime < 0f && throwState == ThrowState.Held)
         {
             swingTime = 0f;
-            if (whooshSound != null)
-            {
-                audioSource.pitch = Random.Range(0.92f, 1.06f);
-                audioSource.PlayOneShot(whooshSound);
-            }
+            // A new click is a new action even if the previous animation's
+            // return motion has not yet fallen below the XR speed threshold.
+            swingActive = false;
+            PlayWhoosh();
         }
 
         if (swingTime >= 0f && throwState == ThrowState.Held)
@@ -257,20 +252,20 @@ public sealed class WukongStaffController : MonoBehaviour
             float t = Mathf.Clamp01(swingTime / duration);
             float arc = Mathf.Sin(t * Mathf.PI);
             float side = Mathf.Lerp(-1f, 1f, t);
-            Vector3 swingOffset = playerCamera != null
-                ? playerCamera.transform.right * (side * 0.16f)
-                    + playerCamera.transform.up * (arc * 0.07f)
-                    + playerCamera.transform.forward * (arc * 0.08f)
-                : new Vector3(side * 0.16f, arc * 0.07f, arc * 0.08f);
-            handAnchor.SetPositionAndRotation(
-                basePosition + swingOffset,
-                baseRotation * Quaternion.Euler(-18f * arc, side * 35f, -side * 22f));
-            if (t >= 1f)
-            {
-                swingTime = -1f;
-                handAnchor.SetPositionAndRotation(basePosition, baseRotation);
-            }
+            // Animate around the aimed tip so clicking never pulls the staff
+            // away from the cursor or delays the input behind an animation.
+            baseRotation *= Quaternion.Euler(-18f * arc, side * 20f * arc, -side * 16f * arc);
+            if (t >= 1f) swingTime = -1f;
         }
+        handAnchor.SetPositionAndRotation(aimPoint-baseRotation*tipInHand,baseRotation);
+    }
+
+    private Vector3 HeldTipInHand()
+    {
+        if (!(staffCollider is CapsuleCollider capsule)) return Vector3.zero;
+        Vector3 axis = capsule.direction==0?Vector3.right:capsule.direction==1?Vector3.up:Vector3.forward;
+        Vector3 tip = capsule.center+axis*Mathf.Max(0,capsule.height*.5f-capsule.radius);
+        return heldLocalPosition+heldLocalRotation*Vector3.Scale(tip,transform.localScale);
     }
 
     public bool TryGetStrike(Vector3 previousRock, Vector3 currentRock, float radius, out double contactDsp, out int actionId)
@@ -283,9 +278,18 @@ public sealed class WukongStaffController : MonoBehaviour
         }
         float hitRadius = Mathf.Max(0.03f, radius) + Mathf.Max(0f, contactForgiveness);
         float fraction = 2f;
-        if (SweepSphere(previousStaffTip - previousRock, lastStaffTip - currentRock, hitRadius, out float tip)) fraction = tip;
-        if (SweepSphere(previousStaffCenter - previousRock, lastStaffCenter - currentRock, hitRadius, out float center)) fraction = Mathf.Min(fraction, center);
-        if (Vector3.Distance(staffCollider.ClosestPoint(currentRock), currentRock) <= hitRadius) fraction = Mathf.Min(fraction, 1f);
+        // Cover both ends and the full shaft. Read transforms directly: physics
+        // ClosestPoint/bounds may still describe the previous physics frame.
+        if (staffCollider is CapsuleCollider capsule)
+            hitRadius += capsule.radius * Mathf.Max(Mathf.Abs(capsule.transform.lossyScale.x), Mathf.Max(Mathf.Abs(capsule.transform.lossyScale.y), Mathf.Abs(capsule.transform.lossyScale.z)));
+        for (int i = 0; i <= 4; i++)
+        {
+            float along = i * .25f;
+            Vector3 previous = Vector3.Lerp(previousStaffBase, previousStaffTip, along);
+            Vector3 current = Vector3.Lerp(lastStaffBase, lastStaffTip, along);
+            if (SweepSphere(previous - previousRock, current - currentRock, hitRadius, out float contact))
+                fraction = Mathf.Min(fraction, contact);
+        }
         if (fraction > 1f) return false;
         contactDsp = previousSampleDsp + (sampleDsp - previousSampleDsp) * fraction;
         return true;
@@ -300,8 +304,9 @@ public sealed class WukongStaffController : MonoBehaviour
 
     public void ResetContactHistory()
     {
-        previousStaffCenter = lastStaffCenter = staffCollider != null ? staffCollider.bounds.center : transform.position;
+        previousStaffCenter = lastStaffCenter = CalculateStaffCenter();
         previousStaffTip = lastStaffTip = CalculateStaffTip();
+        previousStaffBase = lastStaffBase = lastStaffCenter * 2f - lastStaffTip;
         previousSampleDsp = sampleDsp = AudioSettings.dspTime;
         swingActive = false;
         swingSpeed = 0f;
@@ -342,6 +347,19 @@ public sealed class WukongStaffController : MonoBehaviour
             : Vector3.forward;
         float halfSegment = Mathf.Max(0f, capsule.height * 0.5f - capsule.radius);
         return capsule.transform.TransformPoint(capsule.center + axis * halfSegment);
+    }
+
+    private Vector3 CalculateStaffCenter()
+    {
+        if (staffCollider is CapsuleCollider capsule) return capsule.transform.TransformPoint(capsule.center);
+        return staffCollider != null ? staffCollider.bounds.center : transform.position;
+    }
+
+    private void PlayWhoosh()
+    {
+        if (whooshSound == null || audioSource == null) return;
+        audioSource.pitch = 1f;
+        audioSource.PlayOneShot(whooshSound);
     }
 
     private static float DistanceToSegment(Vector3 point, Vector3 start, Vector3 end)

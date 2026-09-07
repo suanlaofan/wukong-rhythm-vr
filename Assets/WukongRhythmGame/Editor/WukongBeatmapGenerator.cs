@@ -111,7 +111,8 @@ public static class WukongBeatmapGenerator
             return;
         }
 
-        if (song.lockBeatmap) { Debug.Log("Chart is locked: " + song.title); return; }
+        if (song.lockBeatmap || (song.beatTimesSeconds != null && song.beatTimesSeconds.Count > 1))
+        { Debug.Log("Preserving imported pulse timeline: " + song.title); return; }
         AudioClip clip = song.audioClip;
         string clipPath = AssetDatabase.GetAssetPath(clip);
         AudioImporter importer = AssetImporter.GetAtPath(clipPath) as AudioImporter;

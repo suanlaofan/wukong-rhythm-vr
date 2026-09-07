@@ -49,7 +49,7 @@ public sealed class WukongRhythmGame : MonoBehaviour
 
     [Header("Audio Mix")]
     [Range(0f, 1f)] public float musicVolume = 1f;
-    [Range(0f, 1f)] public float effectsVolume = 0.28f;
+    [Range(0f, 1f)] public float effectsVolume = 0.7f;
 
     private readonly List<WukongBeatRock> activeRocks = new List<WukongBeatRock>();
     private readonly Stack<WukongBeatRock> rockPool = new Stack<WukongBeatRock>();
@@ -67,6 +67,7 @@ public sealed class WukongRhythmGame : MonoBehaviour
     private float lastEarlyHint;
     private AudioSource musicSource;
     private AudioSource effectsSource;
+    private AudioSource impactSource;
     private UnityEngine.XR.InputDevice leftHandDevice;
     private UnityEngine.XR.InputDevice rightHandDevice;
     private WukongSongDefinition currentSong;
@@ -98,9 +99,7 @@ public sealed class WukongRhythmGame : MonoBehaviour
     public float SongTime => state == BattleState.Paused || state == BattleState.Resuming ? pausedSongTime
         : state == BattleState.Playing || state == BattleState.Ending || (state == BattleState.CountIn && songScheduled)
             ? (float)(AudioSettings.dspTime - songStartDsp) : 0f;
-    public float CurrentBeat => currentSong != null
-        ? (SongTime - currentSong.beatOffsetSeconds) / Mathf.Max(0.001f, beatDuration)
-        : 0f;
+    public float CurrentBeat => currentSong != null ? currentSong.BeatAtTime(SongTime) : 0f;
 
     private void Awake()
     {
@@ -116,6 +115,14 @@ public sealed class WukongRhythmGame : MonoBehaviour
         effectsSource.playOnAwake = false;
         effectsSource.spatialBlend = 0f;
         effectsSource.volume = Mathf.Clamp01(effectsVolume);
+        effectsSource.priority = 80;
+        impactSource = gameObject.AddComponent<AudioSource>();
+        impactSource.playOnAwake = false;
+        impactSource.spatialBlend = 0f;
+        impactSource.priority = 16;
+        impactSource.volume = Mathf.Clamp01(effectsVolume);
+        foreach (AudioClip clip in new[] { staffImpactSound, rockShatterSound, fireImpactSound, victorySound })
+            if (clip != null) clip.LoadAudioData();
     }
 
     private void Start()
@@ -285,8 +292,7 @@ public sealed class WukongRhythmGame : MonoBehaviour
             ReturnToSongSelection();
             yield break;
         }
-        float firstNote = currentSong.TimeAtNote(currentSong.notes[0]);
-        double preroll = Mathf.Max(4 * beatDuration, currentSong.travelBeats * beatDuration - firstNote + 0.2f);
+        double preroll = Mathf.Max(4 * beatDuration, -currentSong.SpawnTimeAtNote(currentSong.notes[0]) + 0.2f);
         songStartDsp = AudioSettings.dspTime + preroll;
         songScheduled = true;
         musicSource.PlayScheduled(songStartDsp);
@@ -340,7 +346,6 @@ public sealed class WukongRhythmGame : MonoBehaviour
         effectPool?.SetPaused(false);
         if (monsterAnimator != null) monsterAnimator.speed = 1f;
         staff?.ResetContactHistory();
-        for (int i = 0; i < activeRocks.Count; i++) activeRocks[i].ResetContactHistory();
         hud?.ShowGameplay(currentSong);
         battleRoutine = null;
     }
@@ -405,7 +410,7 @@ public sealed class WukongRhythmGame : MonoBehaviour
         {
             WukongBeatNote note = currentSong.notes[nextNoteIndex];
             float targetSongTime = currentSong.TimeAtNote(note);
-            float spawnSongTime = targetSongTime - currentSong.travelBeats * beatDuration;
+            float spawnSongTime = currentSong.SpawnTimeAtNote(note);
             if (SongTime < spawnSongTime)
             {
                 break;
@@ -443,7 +448,8 @@ public sealed class WukongRhythmGame : MonoBehaviour
             start = target + targetToMonster.normalized * maximumVisibleTravelDistance;
         }
 
-        rock.Initialize(this, start, target, spawnSongTime, targetSongTime, lane, spellRock, note.warningBeats);
+        rock.Initialize(this, start, target, spawnSongTime, targetSongTime, lane, spellRock,
+            currentSong.WarningTimeAtNote(note));
         activeRocks.Add(rock);
         totalSpawned++;
 
@@ -483,7 +489,13 @@ public sealed class WukongRhythmGame : MonoBehaviour
         }
 
         staff?.ConfirmHit(perfect ? 0.82f : 0.55f);
-        PlayEffect(staffImpactSound, perfect ? 1.05f : 0.94f, 0.85f);
+        // Impact has a dedicated voice: debris/fire pitch changes must not alter
+        // the attack transient or steal the audible hit feedback.
+        if (staffImpactSound != null && impactSource != null)
+        {
+            impactSource.pitch = 1f;
+            impactSource.PlayOneShot(staffImpactSound, 1f);
+        }
         UpdateHud();
     }
 

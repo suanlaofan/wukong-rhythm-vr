@@ -4537,9 +4537,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WukongRhythmGame
   songLibrary: {fileID: 11400000, guid: 7b44e5baf8f0b4037865e53f2a6d3c68, type: 2}
-  rockShatterSound: {fileID: 8300000, guid: 5fa4b88cd22f04e7da322a8a9c584fe8, type: 3}
-  fireImpactSound: {fileID: 8300000, guid: 1d02558e85ac842759b4ac5f2a4b398b, type: 3}
-  staffImpactSound: {fileID: 8300000, guid: ed7acc2fd591a43ce8938b22e88de315, type: 3}
+  rockShatterSound: {fileID: 8300000, guid: 3e1f6b40cc8ea4ff39cfee7e9fe87875, type: 3}
+  fireImpactSound: {fileID: 8300000, guid: 4aebf1dba7faf491c932fd8016e176b8, type: 3}
+  staffImpactSound: {fileID: 8300000, guid: 49fe7a4c4b4ac46638596eb46c3cb943, type: 3}
   victorySound: {fileID: 8300000, guid: 82d669ce406664eedac890ef623f6962, type: 3}
   rockMaterial: {fileID: 2100000, guid: bfbaa7755ea17454296d788ca56de9e9, type: 2}
   particleMaterial: {fileID: 2100000, guid: c64dc81d94ce9463899b19c01a59d99e, type: 2}
@@ -4554,7 +4554,7 @@ MonoBehaviour:
   perfectWindow: 0.07
   inputTimingOffsetSeconds: 0
   musicVolume: 1
-  effectsVolume: 0.28
+  effectsVolume: 0.7
 --- !u!4 &604269411
 Transform:
   m_ObjectHideFlags: 0
@@ -13975,8 +13975,8 @@ MonoBehaviour:
   playerCamera: {fileID: 1790213583}
   staffCollider: {fileID: 1690785176}
   swingTrail: {fileID: 856120610}
-  whooshSound: {fileID: 8300000, guid: e96b8696acc054f2392ccb6ba0ade891, type: 3}
-  whooshVolume: 0.2
+  whooshSound: {fileID: 8300000, guid: 1f5ecbfcf959548f5b5b66d66c717a87, type: 3}
+  whooshVolume: 0.35
   minimumStrikeSpeed: 0.58
   contactForgiveness: 0.16
   maximumThrowDistance: 4.5

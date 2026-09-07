@@ -386,9 +386,11 @@ public sealed class WukongRhythmHud : MonoBehaviour
         {
             SetText(songNameValue, displayedSong.LocalizedTitle(isChinese).ToUpperInvariant());
         }
-        SetText(operationHint, Localize(
-            "STRIKE WHEN THE RINGS MEET · A THROW\nB / ESC PAUSE · X / L 中文",
-            "光圈重合时挥棒 · A 投掷\nB / ESC 暂停 · X / L ENGLISH"));
+        SetText(operationHint, UnityEngine.XR.XRSettings.isDeviceActive
+            ? Localize("STRIKE WHEN THE RINGS MEET · A THROW\nB PAUSE · X 中文",
+                "光圈重合时挥棒 · A 投掷\nB 暂停 · X ENGLISH")
+            : Localize("MOUSE MOVE · CLICK / SPACE HIT\nT THROW · ESC PAUSE · L 中文",
+                "鼠标移棒 · 合圈时左键/空格击打\nT 投掷 · ESC 暂停 · L ENGLISH"));
 
         if (countInValue > 0)
         {
