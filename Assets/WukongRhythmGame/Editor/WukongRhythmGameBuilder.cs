@@ -202,7 +202,7 @@ public static class WukongRhythmGameBuilder
         Debug.Log("PICO Android APK built at " + Path.GetFullPath(outputPath));
     }
 
-    private static void ConfigurePicoBuildSettings()
+    internal static void ConfigurePicoBuildSettings()
     {
         if (!EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android))
         {
@@ -211,7 +211,10 @@ public static class WukongRhythmGameBuilder
 
         PlayerSettings.companyName = "PICO Rhythm Studio";
         PlayerSettings.productName = "Wukong Rhythm VR";
-        PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, "com.UnityTechnologies.com.unity.template.urpblank");
+        // Keep the registered identity. Diagnostic/release builders validate it;
+        // rebuilding a scene must never silently reset it to a Unity template.
+        string requestedId = System.Environment.GetEnvironmentVariable("WUKONG_PACKAGE_ID");
+        if (!string.IsNullOrWhiteSpace(requestedId)) PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, requestedId);
         PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel29;
         // PICO targets are ARM64-only, and Unity requires IL2CPP for Android ARM64.
         PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);

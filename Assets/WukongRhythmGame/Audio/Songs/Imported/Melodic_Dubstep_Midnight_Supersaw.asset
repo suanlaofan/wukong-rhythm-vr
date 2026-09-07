@@ -23,1230 +23,1479 @@ MonoBehaviour:
   beatOffsetSeconds: 0.0375
   travelBeats: 6
   beatsPerBar: 4
-  generatorVersion: 3
+  generatorVersion: 4
+  lockBeatmap: 1
+  auditoryReviewed: 0
+  chartProvenance: 2026-09-07 automatic onset correction; no listening approval;
+    see chart-audit.json
   notes:
   - beat: 7
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0275
   - beat: 8.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.4842421
+    timingOffsetSeconds: -0.007499
   - beat: 9.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 11
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 12.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0075
   - beat: 13.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 15
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 16
     lane: 1
     type: 1
     warningBeats: 2
     strength: 1.3327211
+    timingOffsetSeconds: 0.017501
   - beat: 17.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.6302843
+    timingOffsetSeconds: -0.0125
   - beat: 18.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.037499
   - beat: 19.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 21
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 22.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0425
   - beat: 24
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.017501
   - beat: 25.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 26.5
+    timingOffsetSeconds: 0.0275
+  - beat: 26.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0175
   - beat: 28
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0025
   - beat: 29
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0275
   - beat: 30.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.032501
   - beat: 31.75
     lane: 1
     type: 1
     warningBeats: 2
     strength: 1.8
-  - beat: 33
+    timingOffsetSeconds: 0.0475
+  - beat: 32.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0475
   - beat: 34
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.002501
   - beat: 35
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0275
   - beat: 36.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.5933253
+    timingOffsetSeconds: -0.0375
   - beat: 37.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 38.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0075
   - beat: 40
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0175
   - beat: 41.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0275
   - beat: 42.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0125
   - beat: 43.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0125
   - beat: 44.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0025
   - beat: 45.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0025
   - beat: 46.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0225
   - beat: 48
     lane: 1
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 49
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0425
   - beat: 50.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.2105703
+    timingOffsetSeconds: 0.0175
   - beat: 51.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.0444239
+    timingOffsetSeconds: -0.0275
   - beat: 52.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 53.75
+    timingOffsetSeconds: 0.0275
+  - beat: 53.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0475
   - beat: 55
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.6502112
+    timingOffsetSeconds: 0.0225
   - beat: 56
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0025
   - beat: 57.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0325
   - beat: 58.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.002501
   - beat: 59.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0025
   - beat: 60.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0375
   - beat: 62
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.7972732
+    timingOffsetSeconds: -0.0275
   - beat: 63
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 64
     lane: 0
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0425
   - beat: 65.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0425
   - beat: 66.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0025
   - beat: 67.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0225
   - beat: 68.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0375
   - beat: 69.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0375
   - beat: 71
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.4474809
+    timingOffsetSeconds: -0.0225
   - beat: 72.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.0060221
+    timingOffsetSeconds: -0.0275
   - beat: 73.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 74.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 75.5
+    timingOffsetSeconds: 0.0325
+  - beat: 75.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.566355
+    timingOffsetSeconds: -0.0475
   - beat: 76.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 77.5
+    timingOffsetSeconds: 0.0325
+  - beat: 77.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 78.75
+    timingOffsetSeconds: -0.0425
+  - beat: 78.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.047501
   - beat: 80
     lane: 0
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0075
   - beat: 81.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.7375946
+    timingOffsetSeconds: -0.0025
   - beat: 82.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.0984331
+    timingOffsetSeconds: -0.0125
   - beat: 83.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0075
   - beat: 85
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.1582255
+    timingOffsetSeconds: 0.0025
   - beat: 86.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0175
   - beat: 87.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0125
   - beat: 88.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0075
   - beat: 89.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0375
   - beat: 90.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0075
   - beat: 91.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0025
   - beat: 92.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0225
   - beat: 94
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0375
   - beat: 95
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0025
   - beat: 96
     lane: -1
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0075
   - beat: 97.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0125
   - beat: 98.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0075
   - beat: 99.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 101
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 102.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.6081959
+    timingOffsetSeconds: -0.0425
   - beat: 104
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 105
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 106.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.002499
   - beat: 107.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0025
   - beat: 108.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0375
   - beat: 109.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.6465298
+    timingOffsetSeconds: -0.0075
   - beat: 111
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0175
   - beat: 112
     lane: -1
     type: 1
     warningBeats: 2
     strength: 1.8
-  - beat: 113
+    timingOffsetSeconds: 0.032501
+  - beat: 113.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0475
   - beat: 114.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.047499
   - beat: 116
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0425
   - beat: 117
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0275
   - beat: 118.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.704295
+    timingOffsetSeconds: 0.0025
   - beat: 119.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0175
   - beat: 120.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0225
   - beat: 121.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.2713104
+    timingOffsetSeconds: -0.0375
   - beat: 123
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0325
   - beat: 124.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0275
   - beat: 125.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 126.25
+    timingOffsetSeconds: -0.0275
+  - beat: 126
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0475
   - beat: 127.5
     lane: -1
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 128.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0075
   - beat: 129.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0125
   - beat: 130.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.6930382
+    timingOffsetSeconds: -0.0225
   - beat: 132
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0225
   - beat: 133
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0025
   - beat: 134.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.7202679
+    timingOffsetSeconds: 0.0025
   - beat: 135.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0225
   - beat: 136.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0375
   - beat: 137.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.621837
+    timingOffsetSeconds: 0.0225
   - beat: 138.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 139.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0025
   - beat: 140.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 142
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0175
   - beat: 143.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0225
   - beat: 144.5
     lane: 1
     type: 1
     warningBeats: 2
     strength: 1.8
-  - beat: 145.75
+    timingOffsetSeconds: -0.042499
+  - beat: 146
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 147
+    timingOffsetSeconds: -0.0425
+  - beat: 146.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0475
   - beat: 148.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0025
   - beat: 149.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0325
   - beat: 150.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.7750456
+    timingOffsetSeconds: -0.0325
   - beat: 151.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0475
   - beat: 153
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 154.25
+    timingOffsetSeconds: -0.0475
+  - beat: 154.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 155.5
+    timingOffsetSeconds: -0.0475
+  - beat: 155.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0475
   - beat: 156.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0275
   - beat: 157.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0075
   - beat: 158.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0075
   - beat: 159.75
     lane: 1
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0175
   - beat: 161
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0275
   - beat: 162.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 163.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0225
   - beat: 164.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.002501
   - beat: 165.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0025
   - beat: 167
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 168
+    timingOffsetSeconds: 0.0125
+  - beat: 168.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0275
   - beat: 169.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0025
   - beat: 170.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0125
   - beat: 171.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0275
   - beat: 172.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.012499
   - beat: 173.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0275
   - beat: 174.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.012499
   - beat: 175.75
     lane: 1
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0025
   - beat: 177
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 178
+    timingOffsetSeconds: 0.0275
+  - beat: 178.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.032499
   - beat: 179.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0225
   - beat: 180.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0275
   - beat: 181.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0025
   - beat: 182.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 184
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 185
+    timingOffsetSeconds: 0.0225
+  - beat: 185.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0225
   - beat: 186.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 187.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0275
   - beat: 188.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 189.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0125
   - beat: 190.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0225
   - beat: 192
     lane: 1
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0025
   - beat: 193
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.75802
+    timingOffsetSeconds: 0.0225
   - beat: 194.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0125
   - beat: 195.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.5999532
+    timingOffsetSeconds: -0.0175
   - beat: 196.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0325
   - beat: 197.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0175
   - beat: 198.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0225
   - beat: 199.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0075
   - beat: 201
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0125
   - beat: 202.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0125
   - beat: 203.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0225
   - beat: 204.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0125
   - beat: 206
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0275
   - beat: 207
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 208.25
     lane: 0
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.007499
   - beat: 209.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 210.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0075
   - beat: 211.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 213
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 214
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 215.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 217
+    timingOffsetSeconds: -0.0175
+  - beat: 216.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0425
   - beat: 218.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 220
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 221
+    timingOffsetSeconds: -0.0225
+  - beat: 220.75
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0425
   - beat: 222.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.022501
   - beat: 223.5
     lane: 0
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0025
   - beat: 224.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0025
   - beat: 226
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 227
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0425
   - beat: 228.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.007499
   - beat: 229.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0175
   - beat: 230.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0125
   - beat: 231.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 232.5
+    timingOffsetSeconds: -0.0025
+  - beat: 232.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.037499
   - beat: 233.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0175
   - beat: 235
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0325
   - beat: 236.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.032499
   - beat: 237.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 238.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.042499
   - beat: 239.5
     lane: -1
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0225
   - beat: 241
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.5832335
+    timingOffsetSeconds: -0.0275
   - beat: 242
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 243
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.1271566
+    timingOffsetSeconds: 0.0325
   - beat: 244.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0075
   - beat: 245.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 246.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0125
   - beat: 247.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.7966496
+    timingOffsetSeconds: -0.0425
   - beat: 249
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0175
   - beat: 250.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0025
   - beat: 251.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0275
   - beat: 252.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0275
   - beat: 253.75
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 254.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0175
   - beat: 255.75
     lane: -1
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0375
   - beat: 257
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.5151054
+    timingOffsetSeconds: 0.0325
   - beat: 258
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 259
+    timingOffsetSeconds: 0.0325
+  - beat: 259.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0275
   - beat: 260.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0225
   - beat: 261.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0175
   - beat: 262.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0225
   - beat: 263.75
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0325
   - beat: 265
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 266
+    timingOffsetSeconds: 0.0025
+  - beat: 266.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 267
+    timingOffsetSeconds: -0.017499
+  - beat: 267.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0175
   - beat: 268.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0375
   - beat: 269.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0375
   - beat: 270.5
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 271.5
+    timingOffsetSeconds: 0.027501
+  - beat: 271.75
     lane: -1
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 273
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0425
   - beat: 274.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 275.5
+    timingOffsetSeconds: -0.0075
+  - beat: 275.25
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0475
   - beat: 277
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0325
   - beat: 278.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.6717039
+    timingOffsetSeconds: 0.0025
   - beat: 279.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.5980821
+    timingOffsetSeconds: 0.0075
   - beat: 280.5
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0275
   - beat: 281.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0075
   - beat: 283
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0375
   - beat: 284
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.027501
   - beat: 285
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0025
   - beat: 286.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.037501
   - beat: 287.25
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
-  - beat: 288.5
+    timingOffsetSeconds: 0.0025
+  - beat: 288.25
     lane: 1
     type: 1
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: 0.0475
   - beat: 289.5
     lane: 1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0275
   - beat: 291
     lane: 0
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0275
   - beat: 292.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0425
   - beat: 293.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.0075
   - beat: 294.25
     lane: -1
     type: 0
     warningBeats: 2
     strength: 1.8
+    timingOffsetSeconds: -0.007499

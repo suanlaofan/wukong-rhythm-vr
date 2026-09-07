@@ -2,147 +2,91 @@ using UnityEngine;
 
 public sealed class WukongHitWarningRing : MonoBehaviour
 {
-    private const int SegmentCount = 48;
+    private const int SegmentCount = 40;
     private WukongRhythmGame game;
-    private LineRenderer outerRing;
-    private LineRenderer innerRing;
-    private float targetSongTime;
-    private float warningBeats;
-    private bool resolved;
-    private float resolveStarted;
+    private LineRenderer targetRing, approachRing;
+    private float targetSongTime, warningBeats, resolveStarted;
+    private bool resolved, powerful;
     private Color resolveColor;
 
-    public static WukongHitWarningRing Create(
-        WukongRhythmGame owner,
-        Vector3 position,
-        float targetTime,
-        float warningBeatCount,
-        bool powerful)
+    public static WukongHitWarningRing Create(WukongRhythmGame owner)
     {
-        GameObject ringObject = new GameObject("Rhythm Hit Warning Ring");
-        ringObject.transform.SetParent(owner.transform, true);
-        WukongHitWarningRing ring = ringObject.AddComponent<WukongHitWarningRing>();
-        ring.Initialize(owner, position, targetTime, warningBeatCount, powerful);
+        GameObject root = new GameObject("Pooled Rhythm Timing Ring");
+        root.transform.SetParent(owner.transform, false);
+        WukongHitWarningRing ring = root.AddComponent<WukongHitWarningRing>();
+        ring.game = owner;
+        ring.targetRing = ring.CreateLine("Hit Circle", 0.016f);
+        ring.approachRing = ring.CreateLine("Approach Circle", 0.012f);
+        root.SetActive(false);
         return ring;
     }
 
-    private void Initialize(
-        WukongRhythmGame owner,
-        Vector3 position,
-        float targetTime,
-        float warningBeatCount,
-        bool powerful)
+    public void Initialize(WukongRhythmGame owner, Vector3 position, float targetTime, float warningBeatCount, bool strong)
     {
-        game = owner;
-        targetSongTime = targetTime;
-        warningBeats = Mathf.Max(2f, warningBeatCount);
-        transform.position = position;
-        if (game.playerCamera != null)
-        {
-            transform.rotation = Quaternion.LookRotation(game.playerCamera.transform.forward, game.playerCamera.transform.up);
-        }
-
-        outerRing = CreateLine("Outer", powerful ? 0.022f : 0.016f);
-        innerRing = CreateLine("Inner", powerful ? 0.014f : 0.009f);
-        SetCircle(outerRing, 0.28f);
-        SetCircle(innerRing, 0.175f);
-        SetColor(new Color(0.35f, 0.92f, 1f, 0.06f));
+        game = owner; targetSongTime = targetTime; warningBeats = Mathf.Clamp(warningBeatCount, 1f, 1.5f); powerful = strong;
+        resolved = false;
+        transform.SetPositionAndRotation(position, owner.ArenaRotation);
+        transform.localScale = Vector3.one;
+        gameObject.SetActive(true);
+        UpdateVisual();
     }
 
     private void Update()
     {
         if (resolved)
         {
-            float fade = 1f - Mathf.Clamp01((Time.unscaledTime - resolveStarted) / 0.28f);
-            transform.localScale = Vector3.one * Mathf.Lerp(1f, resolveColor == Color.clear ? 1.45f : 1.2f, 1f - fade);
-            SetColor(new Color(resolveColor.r, resolveColor.g, resolveColor.b, fade * 0.9f));
-            if (fade <= 0f)
-            {
-                Destroy(gameObject);
-            }
+            float fade = 1f - Mathf.Clamp01((Time.unscaledTime - resolveStarted) / 0.22f);
+            Color color = resolveColor; color.a = fade;
+            SetColor(targetRing, color); SetColor(approachRing, color);
+            if (fade <= 0f) gameObject.SetActive(false);
             return;
         }
+        if (game == null || (game.State != WukongRhythmGame.BattleState.Playing && game.State != WukongRhythmGame.BattleState.CountIn)) return;
+        UpdateVisual();
+    }
 
-        if (game == null || game.State != WukongRhythmGame.BattleState.Playing)
-        {
-            return;
-        }
-
-        float beatsRemaining = (targetSongTime - game.SongTime) * game.CurrentBpm / 60f;
-        float progress = Mathf.Clamp01(1f - beatsRemaining / warningBeats);
-        float visible = Mathf.Lerp(0.14f, 1f, Mathf.SmoothStep(0f, 1f, progress));
-        float pulse = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 10f);
-        transform.localScale = Vector3.one * Mathf.Lerp(1.32f, 1f, progress);
-        SetColor(new Color(0.36f, 0.92f, 1f, visible * Mathf.Lerp(0.24f, 0.68f, pulse)));
+    private void UpdateVisual()
+    {
+        float remaining = (targetSongTime - game.SongTime) * game.CurrentBpm / 60f;
+        bool visible = remaining <= warningBeats;
+        targetRing.enabled = visible; approachRing.enabled = visible;
+        if (!visible) return;
+        float progress = Mathf.Clamp01(1f - remaining / warningBeats);
+        // Only the moving circle shrinks. At the authored target time it meets
+        // the fixed circle, whose radius is a stable spatial reference.
+        approachRing.transform.localScale = Vector3.one * Mathf.Lerp(1.7f, 1f, progress);
+        float beatPhase = Mathf.Repeat(game.CurrentBeat, 1f);
+        float accent = 1f - Mathf.Clamp01(beatPhase / 0.22f);
+        Color color = powerful ? new Color(1f, 0.64f, 0.16f) : new Color(0.36f, 0.92f, 1f);
+        color.a = Mathf.Lerp(0.08f, 0.80f, progress);
+        SetColor(approachRing, color);
+        color.a *= 0.65f + accent * 0.25f;
+        SetColor(targetRing, color);
     }
 
     public void CompleteHit(bool perfect)
     {
-        resolved = true;
-        resolveStarted = Time.unscaledTime;
-        resolveColor = perfect ? new Color(0.42f, 1f, 0.95f) : new Color(1f, 0.92f, 0.58f);
+        targetRing.enabled = true; approachRing.enabled = true;
+        resolved = true; resolveStarted = Time.unscaledTime;
+        resolveColor = perfect ? new Color(0.42f, 1f, 0.95f) : new Color(1f, 0.85f, 0.42f);
     }
+    public void CompleteMiss() { resolved = true; resolveStarted = Time.unscaledTime; resolveColor = new Color(0.65f, 0.22f, 0.3f); }
+    public void Cancel() { resolved = true; gameObject.SetActive(false); }
 
-    public void CompleteMiss()
+    private LineRenderer CreateLine(string label, float width)
     {
-        resolved = true;
-        resolveStarted = Time.unscaledTime;
-        resolveColor = new Color(1f, 0.36f, 0.48f);
-    }
-
-    public void Cancel()
-    {
-        Destroy(gameObject);
-    }
-
-    private LineRenderer CreateLine(string lineName, float width)
-    {
-        GameObject lineObject = new GameObject(lineName);
-        lineObject.transform.SetParent(transform, false);
-        LineRenderer line = lineObject.AddComponent<LineRenderer>();
-        line.useWorldSpace = false;
-        line.loop = true;
-        line.positionCount = SegmentCount;
-        line.widthMultiplier = width;
-        line.numCornerVertices = 4;
-        line.numCapVertices = 4;
-        line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        line.receiveShadows = false;
-        Shader shader = Shader.Find("Sprites/Default");
-        if (shader != null)
+        GameObject child = new GameObject(label); child.transform.SetParent(transform, false);
+        LineRenderer line = child.AddComponent<LineRenderer>();
+        line.useWorldSpace = false; line.loop = true; line.positionCount = SegmentCount;
+        line.widthMultiplier = width; line.numCornerVertices = 0; line.numCapVertices = 0;
+        line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; line.receiveShadows = false;
+        line.sharedMaterial = game.WarningMaterial;
+        for (int i = 0; i < SegmentCount; i++)
         {
-            line.sharedMaterial = new Material(shader);
+            float a = i * Mathf.PI * 2f / SegmentCount;
+            line.SetPosition(i, new Vector3(Mathf.Cos(a), Mathf.Sin(a), 0) * 0.28f);
         }
         return line;
     }
-
-    private static void SetCircle(LineRenderer line, float radius)
-    {
-        if (line == null)
-        {
-            return;
-        }
-
-        for (int i = 0; i < SegmentCount; i++)
-        {
-            float angle = i / (float)SegmentCount * Mathf.PI * 2f;
-            line.SetPosition(i, new Vector3(Mathf.Cos(angle) * radius, Mathf.Sin(angle) * radius, 0f));
-        }
-    }
-
-    private void SetColor(Color color)
-    {
-        if (outerRing != null)
-        {
-            outerRing.startColor = color;
-            outerRing.endColor = color;
-        }
-        if (innerRing != null)
-        {
-            Color inner = color;
-            inner.a *= 0.7f;
-            innerRing.startColor = inner;
-            innerRing.endColor = inner;
-        }
-    }
+    private static void SetColor(LineRenderer line, Color color) { line.startColor = color; line.endColor = color; }
 }

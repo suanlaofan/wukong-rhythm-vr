@@ -18,8 +18,12 @@ public struct WukongBeatNote
     [Min(2f)] public float warningBeats;
     [Range(0.25f, 2f)] public float strength;
 
+    [Tooltip("Per-note seconds correction for a detected or manually reviewed musical attack.")]
+    public float timingOffsetSeconds;
+
     public WukongBeatNote(float beat, int lane, WukongBeatNoteType type, float warningBeats, float strength)
     {
+        this.timingOffsetSeconds = 0f;
         this.beat = Mathf.Max(0f, beat);
         this.lane = Mathf.Clamp(lane, -1, 1);
         this.type = type;
@@ -46,6 +50,10 @@ public sealed class WukongSongDefinition : ScriptableObject
     [Min(2f)] public float travelBeats = 6f;
     [Min(1)] public int beatsPerBar = 4;
     [HideInInspector] public int generatorVersion;
+    [Tooltip("Prevents automatic regeneration of a reviewed or imported chart.")]
+    public bool lockBeatmap;
+    public bool auditoryReviewed;
+    public string chartProvenance;
     public List<WukongBeatNote> notes = new List<WukongBeatNote>();
 
     public float Duration => audioClip != null ? audioClip.length : 0f;
@@ -55,6 +63,8 @@ public sealed class WukongSongDefinition : ScriptableObject
     {
         return beatOffsetSeconds + Mathf.Max(0f, beat) * BeatDuration;
     }
+
+    public float TimeAtNote(WukongBeatNote note) => TimeAtBeat(note.beat) + note.timingOffsetSeconds;
 
     public string LocalizedTitle(bool chinese)
     {
@@ -78,6 +88,6 @@ public sealed class WukongSongDefinition : ScriptableObject
             notes[i] = note;
         }
 
-        notes.Sort((left, right) => left.beat.CompareTo(right.beat));
+        notes.Sort((left, right) => TimeAtNote(left).CompareTo(TimeAtNote(right)));
     }
 }

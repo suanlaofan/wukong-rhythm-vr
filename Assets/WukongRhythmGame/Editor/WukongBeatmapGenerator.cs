@@ -7,7 +7,7 @@ using UnityEngine;
 
 public static class WukongBeatmapGenerator
 {
-    public const int CurrentGeneratorVersion = 3;
+    public const int CurrentGeneratorVersion = 4;
     private const string AudioRoot = "Assets/WukongRhythmGame/Audio";
     private const string SongsRoot = AudioRoot + "/Songs";
     private const string LibraryPath = SongsRoot + "/WukongSongLibrary.asset";
@@ -111,6 +111,7 @@ public static class WukongBeatmapGenerator
             return;
         }
 
+        if (song.lockBeatmap) { Debug.Log("Chart is locked: " + song.title); return; }
         AudioClip clip = song.audioClip;
         string clipPath = AssetDatabase.GetAssetPath(clip);
         AudioImporter importer = AssetImporter.GetAtPath(clipPath) as AudioImporter;
@@ -152,6 +153,8 @@ public static class WukongBeatmapGenerator
             song.beatOffsetSeconds = EstimateBeatOffset(envelope, hopSamples, clip.frequency, song.BeatDuration);
             song.notes = BuildNotes(envelope, hopSamples, clip.frequency, song, clip.length);
             song.generatorVersion = CurrentGeneratorVersion;
+            song.auditoryReviewed = false;
+            song.chartProvenance = "Automatic onset analysis; listening review required";
             song.SortAndSanitize();
             EditorUtility.SetDirty(song);
             AssetDatabase.SaveAssets();
@@ -294,7 +297,9 @@ public static class WukongBeatmapGenerator
             WukongBeatNoteType type = Mathf.RoundToInt(beat) % 16 == 0
                 ? WukongBeatNoteType.Spell
                 : WukongBeatNoteType.Normal;
-            notes.Add(new WukongBeatNote(beat, lane, type, 2f, strength));
+            var note = new WukongBeatNote(beat, lane, type, 2f, strength);
+            note.timingOffsetSeconds = time + 0.01f - song.TimeAtBeat(beat);
+            notes.Add(note);
             lastNoteTime = time;
             if (notes.Count >= 500)
             {

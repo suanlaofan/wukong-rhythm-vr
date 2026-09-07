@@ -1,0 +1,18 @@
+{
+  "zipAlignment16k": true,
+  "status": "LOCAL_APK_VERIFIED",
+  "package": "com.UnityTechnologies.com.unity.template.urpblank",
+  "versionCode": 2,
+  "version": "0.2.0",
+  "debuggable": false,
+  "abis": [
+    "arm64-v8a"
+  ],
+  "bytes": 185892501,
+  "sha256": "0a1e0ac4344e02ba96ed5eaffab0d9ccdc8dabcd30562ecccf805fca3db21c76",
+  "androidSignatureValid": true,
+  "certificateSha256": "1002e7ec219e2f238e4cf33b65f71188b02564d7893fd39785e26a78d495946e",
+  "formalRelease": false,
+  "swanInstallLaunchVerified": false,
+  "targetDeviceFpsVerified": false
+}

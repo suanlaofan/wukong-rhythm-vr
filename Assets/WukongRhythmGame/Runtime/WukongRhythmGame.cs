@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR;
 
+[DefaultExecutionOrder(-100)]
 public sealed class WukongRhythmGame : MonoBehaviour
 {
     public enum BattleState
@@ -12,7 +13,9 @@ public sealed class WukongRhythmGame : MonoBehaviour
         CountIn,
         Playing,
         Ending,
-        Results
+        Results,
+        Paused,
+        Resuming
     }
 
     [Header("Battle Assets")]
@@ -34,13 +37,34 @@ public sealed class WukongRhythmGame : MonoBehaviour
     public WukongRhythmHud hud;
 
     [Header("Rhythm")]
-    [Range(0.2f, 0.55f)] public float hitWindow = 0.38f;
+    [Range(0.08f, 0.25f)] public float hitWindow = 0.14f;
+    [Range(0.02f, 0.12f)] public float perfectWindow = 0.07f;
+    [Range(-0.25f, 0.25f)] public float inputTimingOffsetSeconds;
+    private const string TimingOffsetKey = "Wukong.InputOffsetSeconds";
+    public float PerfectWindow => Mathf.Min(perfectWindow, hitWindow);
+    public Quaternion ArenaRotation => arenaRotation;
+    public Material WarningMaterial => warningMaterial;
+    public double MusicTimeAtDsp(double dsp) => dsp - songStartDsp;
+    public float RhythmAccuracy => WukongRhythmTiming.Accuracy(perfectCount, goodCount, totalHit + totalMiss);
 
     [Header("Audio Mix")]
     [Range(0f, 1f)] public float musicVolume = 1f;
     [Range(0f, 1f)] public float effectsVolume = 0.28f;
 
     private readonly List<WukongBeatRock> activeRocks = new List<WukongBeatRock>();
+    private readonly Stack<WukongBeatRock> rockPool = new Stack<WukongBeatRock>();
+    private readonly List<WukongBeatRock> allRocks = new List<WukongBeatRock>();
+    private WukongHitEffectPool effectPool;
+    private Material warningMaterial;
+    private Vector3 arenaCenter;
+    private Quaternion arenaRotation;
+    private float pausedSongTime;
+    private float lastStableSongTime;
+    private float inputStickX;
+    private float previousStickX;
+    private bool hasFocus = true;
+    private bool songScheduled;
+    private float lastEarlyHint;
     private AudioSource musicSource;
     private AudioSource effectsSource;
     private UnityEngine.XR.InputDevice leftHandDevice;
@@ -71,15 +95,17 @@ public sealed class WukongRhythmGame : MonoBehaviour
 
     public BattleState State => state;
     public float CurrentBpm => currentSong != null ? currentSong.bpm : 120f;
-    public float SongTime => state == BattleState.Playing || state == BattleState.Ending
-        ? Mathf.Max(0f, (float)(AudioSettings.dspTime - songStartDsp))
-        : 0f;
+    public float SongTime => state == BattleState.Paused || state == BattleState.Resuming ? pausedSongTime
+        : state == BattleState.Playing || state == BattleState.Ending || (state == BattleState.CountIn && songScheduled)
+            ? (float)(AudioSettings.dspTime - songStartDsp) : 0f;
     public float CurrentBeat => currentSong != null
         ? (SongTime - currentSong.beatOffsetSeconds) / Mathf.Max(0.001f, beatDuration)
         : 0f;
 
     private void Awake()
     {
+        AudioSettings.OnAudioConfigurationChanged += OnAudioConfigurationChanged;
+        inputTimingOffsetSeconds = Mathf.Clamp(PlayerPrefs.GetFloat(TimingOffsetKey, inputTimingOffsetSeconds), -0.25f, 0.25f);
         musicSource = gameObject.AddComponent<AudioSource>();
         musicSource.playOnAwake = false;
         musicSource.loop = false;
@@ -99,6 +125,12 @@ public sealed class WukongRhythmGame : MonoBehaviour
             rockTemplate.SetActive(false);
         }
 
+        staff?.BindGame(this);
+        Shader ringShader = Shader.Find("Sprites/Default");
+        if (ringShader != null) warningMaterial = new Material(ringShader) { name = "Wukong Shared Timing Ring" };
+        effectPool = gameObject.AddComponent<WukongHitEffectPool>();
+        effectPool.Initialize(particleMaterial);
+        PrewarmRocks();
         state = BattleState.SongSelect;
         selectedSongIndex = Mathf.Clamp(selectedSongIndex, 0, Mathf.Max(0, songLibrary != null ? songLibrary.Count - 1 : 0));
         ShowSongSelection();
@@ -118,8 +150,20 @@ public sealed class WukongRhythmGame : MonoBehaviour
             return;
         }
 
+        if (state == BattleState.Paused)
+        {
+            UpdateCalibration();
+            secondaryHoldTime = secondaryHeld ? secondaryHoldTime + Time.unscaledDeltaTime : 0f;
+            if (secondaryHoldTime >= 0.85f) ReturnToSongSelection();
+            else if (primaryPressed && hasFocus && IsUserPresent()) battleRoutine = StartCoroutine(ResumeBattle());
+            return;
+        }
+        if (state == BattleState.CountIn) { if (songScheduled) UpdateSpawning(); return; }
         if (state == BattleState.Playing)
         {
+            if (secondaryPressed || (Keyboard.current != null && Keyboard.current.pKey.wasPressedThisFrame) || !IsUserPresent())
+            { PauseBattle(); return; }
+            lastStableSongTime = SongTime;
             UpdateBattlePhases();
             UpdateSpawning();
             UpdateMonsterReturn();
@@ -210,10 +254,15 @@ public sealed class WukongRhythmGame : MonoBehaviour
         ClearActiveRocks();
         staff?.CancelThrowAndReattach();
         musicSource.Stop();
+        songScheduled = false;
         currentSong = song;
         currentSong.SortAndSanitize();
         beatDuration = currentSong.BeatDuration;
         ResetScoreState();
+        Vector3 forward = Vector3.ProjectOnPlane(playerCamera.transform.forward, Vector3.up);
+        if (forward.sqrMagnitude < 0.01f) forward = Vector3.forward;
+        arenaRotation = Quaternion.LookRotation(forward.normalized, Vector3.up);
+        arenaCenter = playerCamera.transform.position + arenaRotation * new Vector3(0f, -0.22f, 1.8f);
         if (hud != null)
         {
             hud.ShowGameplay(currentSong);
@@ -224,25 +273,125 @@ public sealed class WukongRhythmGame : MonoBehaviour
     private IEnumerator BeginBattle()
     {
         state = BattleState.CountIn;
-        TryMonsterAnimation("Ready", 0.12f);
-        for (int count = 4; count >= 1; count--)
-        {
-            hud?.ShowCountIn(count);
-            yield return new WaitForSecondsRealtime(Mathf.Clamp(beatDuration, 0.34f, 0.8f));
-        }
-
         musicSource.clip = currentSong.audioClip;
-        songStartDsp = AudioSettings.dspTime + 0.12d;
-        musicSource.PlayScheduled(songStartDsp);
-        nextNoteIndex = 0;
-        state = BattleState.Playing;
-        if (hud != null)
+        musicSource.clip.LoadAudioData();
+        double timeout = Time.realtimeSinceStartupAsDouble + 10;
+        while (musicSource.clip.loadState == AudioDataLoadState.Loading && Time.realtimeSinceStartupAsDouble < timeout)
+            yield return null;
+        if (musicSource.clip.loadState != AudioDataLoadState.Loaded)
         {
-            hud.ShowGameplay(currentSong);
+            Debug.LogError("WUKONG_AUDIO_LOAD_FAILED " + currentSong.songId);
+            battleRoutine = null;
+            ReturnToSongSelection();
+            yield break;
         }
+        float firstNote = currentSong.TimeAtNote(currentSong.notes[0]);
+        double preroll = Mathf.Max(4 * beatDuration, currentSong.travelBeats * beatDuration - firstNote + 0.2f);
+        songStartDsp = AudioSettings.dspTime + preroll;
+        songScheduled = true;
+        musicSource.PlayScheduled(songStartDsp);
+        TryMonsterAnimation("Ready", 0.12f);
+        int displayedCount = -1;
+        while (AudioSettings.dspTime < songStartDsp)
+        {
+            int count = Mathf.CeilToInt((float)(songStartDsp - AudioSettings.dspTime) / beatDuration);
+            if (displayedCount != count) { hud?.ShowCountIn(count); displayedCount = count; }
+            yield return null;
+        }
+        state = BattleState.Playing;
+        effectPool?.SetPaused(false);
+        if (monsterAnimator != null) monsterAnimator.speed = 1f;
+        staff?.ResetContactHistory();
+        hud?.ShowGameplay(currentSong);
         TryMonsterAnimation("Roar", 0.08f);
         monsterReturnAt = 1.35f;
         battleRoutine = null;
+    }
+
+    public void PauseBattle()
+    {
+        if (state != BattleState.Playing) return;
+        pausedSongTime = SongTime;
+        musicSource.Pause();
+        state = BattleState.Paused;
+        effectPool?.SetPaused(true);
+        if (monsterAnimator != null) monsterAnimator.speed = 0f;
+        staff?.CancelThrowAndReattach();
+        secondaryHoldTime = 0f;
+        hud?.ShowPaused(inputTimingOffsetSeconds);
+    }
+
+    private IEnumerator ResumeBattle()
+    {
+        state = BattleState.Resuming;
+        musicSource.Stop();
+        musicSource.timeSamples = Mathf.Clamp(Mathf.RoundToInt(pausedSongTime * currentSong.audioClip.frequency), 0, currentSong.audioClip.samples - 1);
+        double resumeAt = AudioSettings.dspTime + 4 * beatDuration;
+        songStartDsp = resumeAt - pausedSongTime;
+        musicSource.PlayScheduled(resumeAt);
+        int displayedCount = -1;
+        while (AudioSettings.dspTime < resumeAt)
+        {
+            int count = Mathf.CeilToInt((float)(resumeAt - AudioSettings.dspTime) / beatDuration);
+            if (count != displayedCount) { hud?.ShowCountIn(count); displayedCount = count; }
+            yield return null;
+        }
+        state = BattleState.Playing;
+        effectPool?.SetPaused(false);
+        if (monsterAnimator != null) monsterAnimator.speed = 1f;
+        staff?.ResetContactHistory();
+        for (int i = 0; i < activeRocks.Count; i++) activeRocks[i].ResetContactHistory();
+        hud?.ShowGameplay(currentSong);
+        battleRoutine = null;
+    }
+
+    private void UpdateCalibration()
+    {
+        int direction = 0;
+        if (inputStickX > 0.65f && previousStickX <= 0.65f) direction = 1;
+        if (inputStickX < -0.65f && previousStickX >= -0.65f) direction = -1;
+        if (Keyboard.current != null)
+        {
+            if (Keyboard.current.rightArrowKey.wasPressedThisFrame) direction = 1;
+            if (Keyboard.current.leftArrowKey.wasPressedThisFrame) direction = -1;
+        }
+        previousStickX = inputStickX;
+        if (direction == 0) return;
+        inputTimingOffsetSeconds = Mathf.Clamp(inputTimingOffsetSeconds + direction * 0.01f, -0.25f, 0.25f);
+        PlayerPrefs.SetFloat(TimingOffsetKey, inputTimingOffsetSeconds);
+        PlayerPrefs.Save();
+        hud?.ShowPaused(inputTimingOffsetSeconds);
+    }
+
+    private bool IsUserPresent()
+    {
+        UnityEngine.XR.InputDevice head = InputDevices.GetDeviceAtXRNode(XRNode.Head);
+        if (head.isValid && head.TryGetFeatureValue(UnityEngine.XR.CommonUsages.isTracked, out bool tracked) && !tracked) return false;
+        return !head.isValid || !head.TryGetFeatureValue(UnityEngine.XR.CommonUsages.userPresence, out bool present) || present;
+    }
+
+    private void OnApplicationFocus(bool focused)
+    {
+        hasFocus = focused;
+        if (!focused) SuspendBattle();
+    }
+    private void OnApplicationPause(bool paused) { if (paused) SuspendBattle(); }
+    private void SuspendBattle()
+    {
+        if (state == BattleState.Playing) PauseBattle();
+        else if (state == BattleState.CountIn) ReturnToSongSelection();
+        else if (state == BattleState.Resuming)
+        {
+            StopActiveRoutines(); musicSource.Stop(); state = BattleState.Paused;
+            hud?.ShowPaused(inputTimingOffsetSeconds);
+        }
+    }
+
+    public void ShowEarlyHit()
+    {
+        if (Time.unscaledTime - lastEarlyHint < 0.25f) return;
+        lastEarlyHint = Time.unscaledTime;
+        hud?.ShowRating(WukongHudRating.Early, 0.28f);
     }
 
     private void UpdateSpawning()
@@ -255,7 +404,7 @@ public sealed class WukongRhythmGame : MonoBehaviour
         while (nextNoteIndex < currentSong.notes.Count)
         {
             WukongBeatNote note = currentSong.notes[nextNoteIndex];
-            float targetSongTime = currentSong.TimeAtBeat(note.beat);
+            float targetSongTime = currentSong.TimeAtNote(note);
             float spawnSongTime = targetSongTime - currentSong.travelBeats * beatDuration;
             if (SongTime < spawnSongTime)
             {
@@ -280,14 +429,12 @@ public sealed class WukongRhythmGame : MonoBehaviour
         }
 
         bool spellRock = note.type == WukongBeatNoteType.Spell;
-        GameObject instance = Instantiate(rockTemplate, transform);
+        WukongBeatRock rock = rockPool.Count > 0 ? rockPool.Pop() : CreatePooledRock();
+        GameObject instance = rock.gameObject;
         instance.name = spellRock ? "Magma Rhythm Rock" : "Rhythm Rock";
         instance.SetActive(true);
 
-        Vector3 target = playerCamera.transform.position
-            + playerCamera.transform.forward * 1.8f
-            + playerCamera.transform.right * lane * 0.78f
-            - playerCamera.transform.up * 0.22f;
+        Vector3 target = arenaCenter + arenaRotation * Vector3.right * lane * 0.78f;
         Vector3 start = monsterThrowPoint.position;
         Vector3 targetToMonster = start - target;
         const float maximumVisibleTravelDistance = 8.5f;
@@ -296,7 +443,6 @@ public sealed class WukongRhythmGame : MonoBehaviour
             start = target + targetToMonster.normalized * maximumVisibleTravelDistance;
         }
 
-        WukongBeatRock rock = instance.GetComponent<WukongBeatRock>();
         rock.Initialize(this, start, target, spawnSongTime, targetSongTime, lane, spellRock, note.warningBeats);
         activeRocks.Add(rock);
         totalSpawned++;
@@ -307,12 +453,13 @@ public sealed class WukongRhythmGame : MonoBehaviour
 
     public void ResolveHit(WukongBeatRock rock, float timingError)
     {
-        activeRocks.Remove(rock);
+        WukongTimingGrade grade = WukongRhythmTiming.Judge(timingError, PerfectWindow, hitWindow);
+        if ((grade != WukongTimingGrade.Perfect && grade != WukongTimingGrade.Good) || !activeRocks.Remove(rock)) return;
         totalHit++;
         combo++;
         maxCombo = Mathf.Max(maxCombo, combo);
 
-        bool perfect = timingError <= hitWindow * 0.46f;
+        bool perfect = grade == WukongTimingGrade.Perfect;
         int baseScore = perfect ? 120 : 80;
         float multiplier = Mathf.Min(2.5f, 1f + Mathf.Floor(combo / 8f) * 0.25f);
         score += Mathf.RoundToInt(baseScore * multiplier);
@@ -326,6 +473,7 @@ public sealed class WukongRhythmGame : MonoBehaviour
         {
             goodCount++;
             hud?.ShowRating(WukongHudRating.Good, 0.46f);
+            hud?.ShowTimingDetail(timingError);
         }
 
         if (combo % 4 == 0)
@@ -341,7 +489,7 @@ public sealed class WukongRhythmGame : MonoBehaviour
 
     public void ResolveMiss(WukongBeatRock rock)
     {
-        activeRocks.Remove(rock);
+        if (!activeRocks.Remove(rock)) return;
         totalMiss++;
         combo = 0;
         hud?.ShowRating(WukongHudRating.Miss, 0.55f);
@@ -350,64 +498,56 @@ public sealed class WukongRhythmGame : MonoBehaviour
 
     public void SpawnRockExplosion(Vector3 position, bool powerful)
     {
-        int shardCount = powerful ? 12 : 7;
-        for (int i = 0; i < shardCount; i++)
+        effectPool?.Emit(position, powerful, false);
+        PlayEffect(rockShatterSound, 1f, powerful ? 0.5f : 0.3f);
+        if (powerful) PlayEffect(fireImpactSound, 1f, 0.35f);
+    }
+
+    public void SpawnMissEffect(Vector3 position) { effectPool?.Emit(position, false, true); }
+
+    private WukongBeatRock CreatePooledRock()
+    {
+        GameObject instance = Instantiate(rockTemplate, transform);
+        instance.SetActive(false);
+        WukongBeatRock rock = instance.GetComponent<WukongBeatRock>();
+        if (rock == null) rock = instance.AddComponent<WukongBeatRock>();
+        allRocks.Add(rock);
+        return rock;
+    }
+
+    private void PrewarmRocks()
+    {
+        if (rockTemplate == null) return;
+        for (int i = 0; i < 48; i++)
         {
-            GameObject shard = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            shard.name = "Lava Stone Shard";
-            shard.transform.position = position + Random.insideUnitSphere * 0.14f;
-            shard.transform.rotation = Random.rotation;
-            float size = Random.Range(0.065f, powerful ? 0.2f : 0.15f);
-            shard.transform.localScale = new Vector3(size, size * Random.Range(0.5f, 1.5f), size);
-            Renderer renderer = shard.GetComponent<Renderer>();
-            renderer.sharedMaterial = rockMaterial;
-            Rigidbody body = shard.AddComponent<Rigidbody>();
-            body.mass = 0.08f;
-            body.useGravity = true;
-            body.AddExplosionForce(powerful ? 8f : 5.2f, position, 2.4f, 1.5f, ForceMode.Impulse);
-            shard.AddComponent<WukongTransientEffect>().life = Random.Range(0.9f, 1.55f);
+            WukongBeatRock rock = CreatePooledRock();
+            rock.Prepare(this);
+            rockPool.Push(rock);
         }
+    }
 
-        GameObject burstObject = new GameObject("Lava Rock Burst");
-        burstObject.transform.position = position;
-        ParticleSystem particles = burstObject.AddComponent<ParticleSystem>();
-        particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-        ParticleSystem.MainModule main = particles.main;
-        main.duration = 0.38f;
-        main.loop = false;
-        main.startLifetime = new ParticleSystem.MinMaxCurve(0.25f, powerful ? 0.8f : 0.55f);
-        main.startSpeed = new ParticleSystem.MinMaxCurve(2.6f, powerful ? 8.5f : 6f);
-        main.startSize = new ParticleSystem.MinMaxCurve(0.035f, powerful ? 0.22f : 0.14f);
-        main.startColor = new ParticleSystem.MinMaxGradient(new Color(1f, 0.16f, 0.01f), new Color(1f, 0.78f, 0.12f));
-        main.simulationSpace = ParticleSystemSimulationSpace.World;
-        main.maxParticles = 64;
+    public void RecycleRock(WukongBeatRock rock)
+    {
+        rock.gameObject.SetActive(false);
+        rockPool.Push(rock);
+    }
 
-        ParticleSystem.EmissionModule emission = particles.emission;
-        emission.rateOverTime = 0f;
-        ParticleSystem.ShapeModule shape = particles.shape;
-        shape.shapeType = ParticleSystemShapeType.Sphere;
-        shape.radius = 0.12f;
-        ParticleSystemRenderer particleRenderer = particles.GetComponent<ParticleSystemRenderer>();
-        if (particleMaterial != null)
+    private void OnAudioConfigurationChanged(bool deviceChanged)
+    {
+        if (state == BattleState.Playing)
         {
-            particleRenderer.sharedMaterial = particleMaterial;
+            PauseBattle();
+            pausedSongTime = Mathf.Max(0f, lastStableSongTime);
+            musicSource.Stop();
         }
-        particles.Emit(powerful ? 42 : 25);
+        else SuspendBattle();
+        // A device switch can reset DSP time; resume creates a new scheduled origin.
+    }
 
-        Light flashLight = burstObject.AddComponent<Light>();
-        flashLight.type = LightType.Point;
-        flashLight.color = new Color(1f, 0.19f, 0.025f);
-        flashLight.intensity = powerful ? 1800f : 950f;
-        flashLight.range = powerful ? 7f : 4.5f;
-        WukongTransientEffect transient = burstObject.AddComponent<WukongTransientEffect>();
-        transient.life = powerful ? 1.1f : 0.8f;
-        transient.fadeLight = true;
-
-        PlayEffect(rockShatterSound, Random.Range(0.9f, 1.08f), 0.88f);
-        if (powerful)
-        {
-            PlayEffect(fireImpactSound, 0.92f, 0.92f);
-        }
+    private void OnDestroy()
+    {
+        AudioSettings.OnAudioConfigurationChanged -= OnAudioConfigurationChanged;
+        if (warningMaterial != null) Destroy(warningMaterial);
     }
 
     private void UpdateBattlePhases()
@@ -451,7 +591,7 @@ public sealed class WukongRhythmGame : MonoBehaviour
         PlayEffect(victorySound, 1f, 0.95f);
         yield return new WaitForSecondsRealtime(1.1f);
 
-        float accuracy = totalSpawned > 0 ? totalHit / (float)totalSpawned * 100f : 0f;
+        float accuracy = WukongRhythmTiming.Accuracy(perfectCount, goodCount, totalSpawned);
         hud?.ShowResults(score, accuracy, maxCombo, perfectCount, goodCount, totalMiss);
         state = BattleState.Results;
         endRoutine = null;
@@ -461,6 +601,8 @@ public sealed class WukongRhythmGame : MonoBehaviour
     {
         StopActiveRoutines();
         musicSource.Stop();
+        effectPool?.Clear();
+        if (monsterAnimator != null) monsterAnimator.speed = 1f;
         ClearActiveRocks();
         staff?.CancelThrowAndReattach();
         secondaryHoldTime = 0f;
@@ -488,7 +630,8 @@ public sealed class WukongRhythmGame : MonoBehaviour
         {
             if (activeRocks[i] != null)
             {
-                Destroy(activeRocks[i].gameObject);
+                activeRocks[i].Cancel();
+                RecycleRock(activeRocks[i]);
             }
         }
         activeRocks.Clear();
@@ -518,7 +661,7 @@ public sealed class WukongRhythmGame : MonoBehaviour
         }
 
         int resolved = totalHit + totalMiss;
-        float accuracy = resolved > 0 ? totalHit / (float)resolved * 100f : 100f;
+        float accuracy = WukongRhythmTiming.Accuracy(perfectCount, goodCount, resolved);
         float beat = CurrentBeat;
         float beatProgress = beat - Mathf.Floor(beat);
         hud.UpdateGameplay(score, combo, accuracy, GetPhase(), currentSong.bpm, beat, beatProgress);
@@ -606,6 +749,7 @@ public sealed class WukongRhythmGame : MonoBehaviour
         secondaryHeld = secondaryHeldXr || keyboardSecondaryHeld;
         languagePressed = (languageHeld && !previousLanguageButton) || keyboardLanguage;
         stickY = stick.y;
+        inputStickX = stick.x;
         previousPrimaryButton = primaryHeld;
         previousSecondaryButton = secondaryHeldXr;
         previousLanguageButton = languageHeld;

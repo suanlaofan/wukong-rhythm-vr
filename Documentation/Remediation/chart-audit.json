@@ -1,0 +1,359 @@
+[
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Fantasy_Battle_Suspense.asset",
+    "title": "Fantasy Battle Suspense",
+    "bpm": 88.2,
+    "beatOffsetSeconds": 0.637755156,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 88.2,
+      "notes": 84,
+      "onsetMatched": 84,
+      "medianCorrectionMs": 22.7,
+      "maxCorrectionMs": 69.93,
+      "phaseCoherence": 0.072,
+      "auditoryReviewed": false,
+      "tempoDecision": "Retained original tempo: low automatic confidence"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/80s_Synthwave_Neon_Heartbeat.asset",
+    "title": "80s Synthwave - Neon Heartbeat",
+    "bpm": 104.008,
+    "beatOffsetSeconds": 0.117165,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 103.4,
+      "notes": 177,
+      "onsetMatched": 177,
+      "medianCorrectionMs": 19.64,
+      "maxCorrectionMs": 66.38,
+      "phaseCoherence": 0.152,
+      "auditoryReviewed": false,
+      "tempoDecision": "Refined tempo by onset phase coherence; listening review pending"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Acid_Techno_Squelch_and_Sweep.asset",
+    "title": "Acid Techno - Squelch and Sweep",
+    "bpm": 142.023,
+    "beatOffsetSeconds": 0.367337,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 142.9,
+      "notes": 245,
+      "onsetMatched": 245,
+      "medianCorrectionMs": 24.27,
+      "maxCorrectionMs": 77.41,
+      "phaseCoherence": 0.116,
+      "auditoryReviewed": false,
+      "tempoDecision": "Refined tempo by onset phase coherence; listening review pending"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Classic_Dubstep_Neon_Static.asset",
+    "title": "Classic Dubstep - Neon Static",
+    "bpm": 150.0,
+    "beatOffsetSeconds": 0.1,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 150.0,
+      "notes": 245,
+      "onsetMatched": 245,
+      "medianCorrectionMs": 20.0,
+      "maxCorrectionMs": 120.0,
+      "phaseCoherence": 0.071,
+      "auditoryReviewed": false,
+      "tempoDecision": "Retained original tempo: low automatic confidence"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Cute_Electropop_Neon_Heartbeat.asset",
+    "title": "Cute Electropop - Neon Heartbeat",
+    "bpm": 107.1,
+    "beatOffsetSeconds": 0.157563031,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 107.1,
+      "notes": 116,
+      "onsetMatched": 116,
+      "medianCorrectionMs": 22.02,
+      "maxCorrectionMs": 92.39,
+      "phaseCoherence": 0.09,
+      "auditoryReviewed": false,
+      "tempoDecision": "Retained original tempo: low automatic confidence"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Cute_Future_Bass_Neon_Heartbeat.asset",
+    "title": "Cute Future Bass - Neon Heartbeat",
+    "bpm": 90.9,
+    "beatOffsetSeconds": 0.06188119,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 90.9,
+      "notes": 149,
+      "onsetMatched": 148,
+      "medianCorrectionMs": 24.37,
+      "maxCorrectionMs": 83.37,
+      "phaseCoherence": 0.046,
+      "auditoryReviewed": false,
+      "tempoDecision": "Retained original tempo: low automatic confidence"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Dark_Techno_Cold_Precision.asset",
+    "title": "Dark Techno - Cold Precision",
+    "bpm": 130.4,
+    "beatOffsetSeconds": 0.37384972,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 130.4,
+      "notes": 140,
+      "onsetMatched": 139,
+      "medianCorrectionMs": 15.72,
+      "maxCorrectionMs": 87.59,
+      "phaseCoherence": 0.058,
+      "auditoryReviewed": false,
+      "tempoDecision": "Retained original tempo: low automatic confidence"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Deep_House_Midnight_Drift.asset",
+    "title": "Deep House - Midnight Drift",
+    "bpm": 120.005,
+    "beatOffsetSeconds": 0.492728,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 120.0,
+      "notes": 123,
+      "onsetMatched": 123,
+      "medianCorrectionMs": 31.87,
+      "maxCorrectionMs": 83.13,
+      "phaseCoherence": 0.238,
+      "auditoryReviewed": false,
+      "tempoDecision": "Refined tempo by onset phase coherence; listening review pending"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Deep_House_Warm_Horizon.asset",
+    "title": "Deep House - Warm Horizon",
+    "bpm": 124.78,
+    "beatOffsetSeconds": 0.441564,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 125.0,
+      "notes": 133,
+      "onsetMatched": 132,
+      "medianCorrectionMs": 35.0,
+      "maxCorrectionMs": 105.0,
+      "phaseCoherence": 0.215,
+      "auditoryReviewed": false,
+      "tempoDecision": "Refined tempo by onset phase coherence; listening review pending"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/DnB_Neon_Pulse.asset",
+    "title": "DnB - Neon Pulse",
+    "bpm": 117.6,
+    "beatOffsetSeconds": 0.302933663,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 117.6,
+      "notes": 244,
+      "onsetMatched": 241,
+      "medianCorrectionMs": 21.56,
+      "maxCorrectionMs": 111.05,
+      "phaseCoherence": 0.028,
+      "auditoryReviewed": false,
+      "tempoDecision": "Retained original tempo: low automatic confidence"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/DnB_Neurofunk_Pulse.asset",
+    "title": "DnB - Neurofunk Pulse",
+    "bpm": 117.6,
+    "beatOffsetSeconds": 0.207270414,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 117.6,
+      "notes": 243,
+      "onsetMatched": 238,
+      "medianCorrectionMs": 22.83,
+      "maxCorrectionMs": 107.93,
+      "phaseCoherence": 0.031,
+      "auditoryReviewed": false,
+      "tempoDecision": "Retained original tempo: low automatic confidence"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Festival_House_Neon_Horizon.asset",
+    "title": "Festival House - Neon Horizon",
+    "bpm": 131.293,
+    "beatOffsetSeconds": 0.141593,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 130.4,
+      "notes": 245,
+      "onsetMatched": 244,
+      "medianCorrectionMs": 24.19,
+      "maxCorrectionMs": 112.1,
+      "phaseCoherence": 0.102,
+      "auditoryReviewed": false,
+      "tempoDecision": "Refined tempo by onset phase coherence; listening review pending"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Future_Bass_Neon_Horizon.asset",
+    "title": "Future Bass - Neon Horizon",
+    "bpm": 115.4,
+    "beatOffsetSeconds": 0.3412045,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 115.4,
+      "notes": 236,
+      "onsetMatched": 236,
+      "medianCorrectionMs": 22.89,
+      "maxCorrectionMs": 116.13,
+      "phaseCoherence": 0.019,
+      "auditoryReviewed": false,
+      "tempoDecision": "Retained original tempo: low automatic confidence"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Hardstyle_Neon_Horizon.asset",
+    "title": "Hardstyle - Neon Horizon",
+    "bpm": 150.0,
+    "beatOffsetSeconds": 0.125,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 150.0,
+      "notes": 245,
+      "onsetMatched": 242,
+      "medianCorrectionMs": 20.0,
+      "maxCorrectionMs": 100.0,
+      "phaseCoherence": 0.045,
+      "auditoryReviewed": false,
+      "tempoDecision": "Retained original tempo: low automatic confidence"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Melodic_Dubstep_Midnight_Supersaw.asset",
+    "title": "Melodic Dubstep - Midnight Supersaw",
+    "bpm": 150.0,
+    "beatOffsetSeconds": 0.0375,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 150.0,
+      "notes": 245,
+      "onsetMatched": 245,
+      "medianCorrectionMs": 27.5,
+      "maxCorrectionMs": 82.5,
+      "phaseCoherence": 0.031,
+      "auditoryReviewed": false,
+      "tempoDecision": "Retained original tempo: low automatic confidence"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Melodic_Techno_Midnight_Pulse.asset",
+    "title": "Melodic Techno - Midnight Pulse",
+    "bpm": 127.169,
+    "beatOffsetSeconds": 0.454657,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 127.7,
+      "notes": 248,
+      "onsetMatched": 244,
+      "medianCorrectionMs": 23.69,
+      "maxCorrectionMs": 93.25,
+      "phaseCoherence": 0.133,
+      "auditoryReviewed": false,
+      "tempoDecision": "Refined tempo by onset phase coherence; listening review pending"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Minimal_Techno_Hollow_Pulse.asset",
+    "title": "Minimal Techno - Hollow Pulse",
+    "bpm": 129.218,
+    "beatOffsetSeconds": 0.027926,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 130.4,
+      "notes": 249,
+      "onsetMatched": 249,
+      "medianCorrectionMs": 17.87,
+      "maxCorrectionMs": 78.05,
+      "phaseCoherence": 0.194,
+      "auditoryReviewed": false,
+      "tempoDecision": "Refined tempo by onset phase coherence; listening review pending"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Progressive_Trance_Neon_Horizon.asset",
+    "title": "Progressive Trance - Neon Horizon",
+    "bpm": 133.3,
+    "beatOffsetSeconds": 0.225056261,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 133.3,
+      "notes": 250,
+      "onsetMatched": 244,
+      "medianCorrectionMs": 20.7,
+      "maxCorrectionMs": 115.6,
+      "phaseCoherence": 0.065,
+      "auditoryReviewed": false,
+      "tempoDecision": "Retained original tempo: low automatic confidence"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Shibuyakei_Neon_Heartbeat.asset",
+    "title": "Shibuyakei - Neon Heartbeat",
+    "bpm": 128.944,
+    "beatOffsetSeconds": 0.161844,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 127.7,
+      "notes": 202,
+      "onsetMatched": 194,
+      "medianCorrectionMs": 26.94,
+      "maxCorrectionMs": 90.87,
+      "phaseCoherence": 0.13,
+      "auditoryReviewed": false,
+      "tempoDecision": "Refined tempo by onset phase coherence; listening review pending"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Uplifting_Trance_Neon_Static.asset",
+    "title": "Uplifting Trance - Neon Static",
+    "bpm": 88.2,
+    "beatOffsetSeconds": 0.276360571,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 88.2,
+      "notes": 190,
+      "onsetMatched": 186,
+      "medianCorrectionMs": 22.01,
+      "maxCorrectionMs": 86.73,
+      "phaseCoherence": 0.041,
+      "auditoryReviewed": false,
+      "tempoDecision": "Retained original tempo: low automatic confidence"
+    }
+  },
+  {
+    "path": "Assets/WukongRhythmGame/Audio/Songs/Imported/Uplifting_Trance_Sliced_Neon_Static.asset",
+    "title": "Uplifting Trance Sliced - Neon Static",
+    "bpm": 88.2,
+    "beatOffsetSeconds": 0.276360571,
+    "generatorVersion": 4,
+    "audit": {
+      "oldBpm": 88.2,
+      "notes": 190,
+      "onsetMatched": 186,
+      "medianCorrectionMs": 22.01,
+      "maxCorrectionMs": 86.73,
+      "phaseCoherence": 0.041,
+      "auditoryReviewed": false,
+      "tempoDecision": "Retained original tempo: low automatic confidence"
+    }
+  }
+]

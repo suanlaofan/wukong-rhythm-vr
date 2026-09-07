@@ -4550,7 +4550,9 @@ MonoBehaviour:
   playerCamera: {fileID: 1790213583}
   staff: {fileID: 1690785175}
   hud: {fileID: 647637448}
-  hitWindow: 0.38
+  hitWindow: 0.14
+  perfectWindow: 0.07
+  inputTimingOffsetSeconds: 0
   musicVolume: 1
   effectsVolume: 0.28
 --- !u!4 &604269411

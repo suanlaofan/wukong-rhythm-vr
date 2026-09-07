@@ -23,3 +23,6 @@
 *.opendb
 *.VC.db
 .DS_Store
+
+# Local editor acceptance captures
+Captures/Remediation/

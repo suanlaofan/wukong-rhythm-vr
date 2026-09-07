@@ -1,0 +1,16 @@
+{
+  "success": true,
+  "message": "Code executed successfully.",
+  "error": null,
+  "data": {
+    "result": {
+      "state": "Paused",
+      "SongTime": 44.2204857,
+      "missingScripts": 0,
+      "particleModes": "Mesh",
+      "quality": "Mobile"
+    },
+    "compiler": "codedom"
+  },
+  "hint": null
+}

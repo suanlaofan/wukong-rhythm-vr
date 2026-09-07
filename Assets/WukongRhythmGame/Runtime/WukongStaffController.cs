@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR;
 
+[DefaultExecutionOrder(-200)]
 public sealed class WukongStaffController : MonoBehaviour
 {
     private enum ThrowState
@@ -38,7 +39,14 @@ public sealed class WukongStaffController : MonoBehaviour
     private Vector3 lastStaffTip;
     private float swingTime = -1f;
     private float swingSpeed;
-    private float lastAcceptedHitTime;
+    private double previousSampleDsp;
+    private double sampleDsp;
+    private int swingId;
+    private int consumedSwingId = -1;
+    private bool swingActive;
+    private Vector3 previousMotion;
+    private double swingStartedDsp;
+    private WukongRhythmGame game;
     private bool usingXr;
     private ThrowState throwState;
     private Transform throwTarget;
@@ -50,6 +58,11 @@ public sealed class WukongStaffController : MonoBehaviour
 
     public float SwingSpeed => swingSpeed;
     public bool IsThrown => throwState != ThrowState.Held;
+    public int SwingId => swingId;
+    public double SampleDsp => sampleDsp;
+    public double PreviousSampleDsp => previousSampleDsp;
+    public bool HasTrackedHand => usingXr;
+    public void BindGame(WukongRhythmGame owner) { game = owner; }
 
     private void Awake()
     {
@@ -71,6 +84,7 @@ public sealed class WukongStaffController : MonoBehaviour
         lastStaffTip = CalculateStaffTip();
         previousStaffCenter = lastStaffCenter;
         previousStaffTip = lastStaffTip;
+        sampleDsp = previousSampleDsp = AudioSettings.dspTime;
         if (swingTrail != null)
         {
             swingTrail.emitting = false;
@@ -79,10 +93,18 @@ public sealed class WukongStaffController : MonoBehaviour
 
     private void Update()
     {
+        bool wasTracked = usingXr;
         UpdateXrDevice();
-        if (!usingXr)
+        if (wasTracked != usingXr || (!usingXr && XRSettings.isDeviceActive))
         {
-            UpdateDesktopHand();
+            ResetContactHistory();
+            return;
+        }
+        if (!usingXr && (game == null || game.State != WukongRhythmGame.BattleState.Paused && game.State != WukongRhythmGame.BattleState.Resuming)) UpdateDesktopHand();
+        if (game != null && game.State != WukongRhythmGame.BattleState.Playing)
+        {
+            ResetContactHistory();
+            return;
         }
         if (throwState != ThrowState.Held)
         {
@@ -93,12 +115,22 @@ public sealed class WukongStaffController : MonoBehaviour
         Vector3 currentTip = CalculateStaffTip();
         previousStaffCenter = lastStaffCenter;
         previousStaffTip = lastStaffTip;
-        float frameDuration = Mathf.Max(0.0001f, Time.deltaTime);
+        previousSampleDsp = sampleDsp;
+        sampleDsp = AudioSettings.dspTime;
+        float frameDuration = Mathf.Max(0.0001f, (float)(sampleDsp - previousSampleDsp));
         float centerSpeed = Vector3.Distance(currentCenter, lastStaffCenter) / frameDuration;
         float tipSpeed = Vector3.Distance(currentTip, lastStaffTip) / frameDuration;
         // A wrist rotation can leave the collider center almost stationary while
         // the striking end of the staff moves quickly. Use the faster point.
         swingSpeed = Mathf.Max(centerSpeed, tipSpeed);
+        Vector3 motion = currentTip - lastStaffTip;
+        bool moving = swingSpeed >= minimumStrikeSpeed || swingTime >= 0f || IsThrown;
+        bool reversed = !IsThrown && motion.sqrMagnitude > 0.00001f && previousMotion.sqrMagnitude > 0.00001f
+            && Vector3.Dot(motion.normalized, previousMotion.normalized) < -0.2f
+            && sampleDsp - swingStartedDsp > 0.10;
+        if (moving && (!swingActive || reversed)) { swingId++; swingStartedDsp = sampleDsp; }
+        swingActive = moving;
+        previousMotion = motion;
         lastStaffCenter = currentCenter;
         lastStaffTip = currentTip;
         if (swingTrail != null)
@@ -142,9 +174,9 @@ public sealed class WukongStaffController : MonoBehaviour
             && position.sqrMagnitude > 0.01f
             && position.sqrMagnitude < 9f
             && IsFinite(position);
-        bool validRotation = hasRotation
-            && IsFinite(rotation)
-            && Mathf.Abs(Quaternion.Dot(rotation, Quaternion.identity)) < 0.99999f;
+        bool validRotation = hasRotation && IsFinite(rotation)
+            && Quaternion.Dot(rotation, rotation) > 0.5f;
+        if (rightHandDevice.TryGetFeatureValue(UnityEngine.XR.CommonUsages.isTracked, out bool tracked) && !tracked) return;
         if (!validPosition || !validRotation)
         {
             return;
@@ -241,31 +273,55 @@ public sealed class WukongStaffController : MonoBehaviour
         }
     }
 
-    public bool TryStrike(Vector3 worldPoint, float radius)
+    public bool TryGetStrike(Vector3 previousRock, Vector3 currentRock, float radius, out double contactDsp, out int actionId)
     {
-        if (staffCollider == null || Time.time - lastAcceptedHitTime < 0.055f)
+        contactDsp = sampleDsp;
+        actionId = swingId;
+        if (staffCollider == null || !swingActive || consumedSwingId == swingId || sampleDsp <= previousSampleDsp)
         {
             return false;
         }
-        if (throwState == ThrowState.Held && swingSpeed < minimumStrikeSpeed && swingTime < 0f)
-        {
-            return false;
-        }
-
         float hitRadius = Mathf.Max(0.03f, radius) + Mathf.Max(0f, contactForgiveness);
-        Vector3 closest = staffCollider.ClosestPoint(worldPoint);
-        bool touchingCurrentPose = Vector3.Distance(closest, worldPoint) <= hitRadius;
-        bool crossedBetweenFrames = DistanceToSegment(worldPoint, previousStaffCenter, lastStaffCenter)
-            <= hitRadius + staffCollider.bounds.extents.magnitude * 0.22f
-            || DistanceToSegment(worldPoint, previousStaffTip, lastStaffTip)
-            <= hitRadius + staffCollider.bounds.extents.magnitude * 0.12f;
-        if (!touchingCurrentPose && !crossedBetweenFrames)
-        {
-            return false;
-        }
-
-        lastAcceptedHitTime = Time.time;
+        float fraction = 2f;
+        if (SweepSphere(previousStaffTip - previousRock, lastStaffTip - currentRock, hitRadius, out float tip)) fraction = tip;
+        if (SweepSphere(previousStaffCenter - previousRock, lastStaffCenter - currentRock, hitRadius, out float center)) fraction = Mathf.Min(fraction, center);
+        if (Vector3.Distance(staffCollider.ClosestPoint(currentRock), currentRock) <= hitRadius) fraction = Mathf.Min(fraction, 1f);
+        if (fraction > 1f) return false;
+        contactDsp = previousSampleDsp + (sampleDsp - previousSampleDsp) * fraction;
         return true;
+    }
+
+    public bool ConsumeSwing(int actionId)
+    {
+        if (actionId != swingId || consumedSwingId == actionId) return false;
+        consumedSwingId = actionId;
+        return true;
+    }
+
+    public void ResetContactHistory()
+    {
+        previousStaffCenter = lastStaffCenter = staffCollider != null ? staffCollider.bounds.center : transform.position;
+        previousStaffTip = lastStaffTip = CalculateStaffTip();
+        previousSampleDsp = sampleDsp = AudioSettings.dspTime;
+        swingActive = false;
+        swingSpeed = 0f;
+        previousMotion = Vector3.zero;
+        if (swingTrail != null) swingTrail.emitting = false;
+    }
+
+    public static bool SweepSphere(Vector3 from, Vector3 to, float radius, out float fraction)
+    {
+        fraction = 0f;
+        float c = from.sqrMagnitude - radius * radius;
+        if (c <= 0f) return true;
+        Vector3 delta = to - from;
+        float a = delta.sqrMagnitude;
+        if (a < 0.0000001f) return false;
+        float b = Vector3.Dot(from, delta);
+        float discriminant = b * b - a * c;
+        if (discriminant < 0f) return false;
+        fraction = (-b - Mathf.Sqrt(discriminant)) / a;
+        return fraction >= 0f && fraction <= 1f;
     }
 
     private Vector3 CalculateStaffTip()
@@ -348,6 +404,8 @@ public sealed class WukongStaffController : MonoBehaviour
         {
             swingTrail.emitting = false;
         }
+        swingTime = -1f;
+        ResetContactHistory();
     }
 
     private void UpdateThrow()
