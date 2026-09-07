@@ -117,7 +117,7 @@ public sealed class WukongStaffController : MonoBehaviour
     {
         bool wasTracked = usingXr;
         UpdateXrDevice();
-        if (wasTracked != usingXr || (!usingXr && XRSettings.isDeviceActive))
+        if (wasTracked != usingXr || (!usingXr && XRSettings.isDeviceActive && !WukongRuntimeEnvironment.IsEmulator))
         {
             ResetContactHistory();
             return;

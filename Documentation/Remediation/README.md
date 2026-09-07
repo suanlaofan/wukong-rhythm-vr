@@ -1,5 +1,7 @@
 # 悟空节奏 0.2.0 整改实施记录
 
+> 此文件保留早期验收快照。当前 1.1.0 的谱面、UI、模拟器和图标结果见 [Release-1.1.0.md](Release-1.1.0.md)，旧的“未在模拟器测试”不代表当前状态。
+
 日期：2026-09-07。原工程：`/Users/liuzhenjia/Documents/Codex/2026-08-04/wo/outputs/WukongRhythmVR`。分支：`codex/wukong-rhythm-remediation-20260907`。起点：`69190a1e799dd12fcd6d8554e0fb60d72cc0f5ea`。
 
 本轮完成节奏核心、曲谱时间修正、已识别的运行开销优化及发布检查。Swan 真机启动、原约 45 FPS 的瓶颈归因与整改后帧率，仍待设备验收。未向其他会话发送消息。

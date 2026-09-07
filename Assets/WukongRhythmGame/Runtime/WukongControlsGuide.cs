@@ -30,6 +30,8 @@ public sealed class WukongControlsGuide : MonoBehaviour
         if (bindingsLabel != null)
         {
             bindingsLabel.text = Bindings(game.State, xr, chinese);
+            if (WukongRuntimeEnvironment.IsEmulator)
+                bindingsLabel.text = SimulatorBindings(game.State, chinese);
             if (game.State == WukongRhythmGame.BattleState.Paused)
                 bindingsLabel.text += " " + offset.ToString("+0;-0;0") + " ms";
         }
@@ -88,6 +90,23 @@ public sealed class WukongControlsGuide : MonoBehaviour
                 return xr
                     ? (zh ? "挥动右手击打   A 投掷   B 暂停" : "SWING TO STRIKE   A THROW   B PAUSE")
                     : (zh ? "鼠标移棒   左键/空格击打   T 投掷   Esc 暂停" : "MOUSE MOVE   CLICK/SPACE STRIKE   T THROW   ESC PAUSE");
+        }
+    }
+
+    public static string SimulatorBindings(WukongRhythmGame.BattleState state, bool zh)
+    {
+        switch (state)
+        {
+            case WukongRhythmGame.BattleState.SongSelect:
+                return zh ? "I/K 选曲   空格(A) 开始   X 中英" : "I/K SELECT   SPACE (A) START   X LANGUAGE";
+            case WukongRhythmGame.BattleState.Paused:
+                return zh ? "空格 继续   长按 Delete 选曲   J/L 校准" : "SPACE RESUME   HOLD DELETE MUSIC   J/L CALIBRATE";
+            case WukongRhythmGame.BattleState.Results:
+                return zh ? "空格 重玩   Delete 选曲   X 中英" : "SPACE REPLAY   DELETE MUSIC   X LANGUAGE";
+            case WukongRhythmGame.BattleState.Playing:
+                return zh ? "鼠标移动右手   空格 投掷   Delete 暂停" : "MOUSE MOVE RIGHT HAND   SPACE THROW   DELETE PAUSE";
+            default:
+                return Bindings(state, true, zh);
         }
     }
 }

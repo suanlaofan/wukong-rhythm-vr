@@ -90,6 +90,7 @@ public sealed class WukongRhythmGame : MonoBehaviour
     private bool previousPrimaryButton;
     private bool previousSecondaryButton;
     private bool previousLanguageButton;
+    private int loggedSimulatorState = -1;
     private float previousStickY;
     private Coroutine battleRoutine;
     private Coroutine endRoutine;
@@ -370,6 +371,10 @@ public sealed class WukongRhythmGame : MonoBehaviour
 
     private bool IsUserPresent()
     {
+        // PICO's emulator has no physical wear sensor. Its false presence value
+        // otherwise pauses the first playing frame and prevents every resume.
+        // Application focus/pause handling still applies in the emulator.
+        if (WukongRuntimeEnvironment.IsEmulator) return true;
         UnityEngine.XR.InputDevice head = InputDevices.GetDeviceAtXRNode(XRNode.Head);
         if (head.isValid && head.TryGetFeatureValue(UnityEngine.XR.CommonUsages.isTracked, out bool tracked) && !tracked) return false;
         return !head.isValid || !head.TryGetFeatureValue(UnityEngine.XR.CommonUsages.userPresence, out bool present) || present;
@@ -747,11 +752,38 @@ public sealed class WukongRhythmGame : MonoBehaviour
             rightHandDevice.TryGetFeatureValue(UnityEngine.XR.CommonUsages.primary2DAxis, out stick);
         }
 
+        bool simulator = WukongRuntimeEnvironment.IsEmulator;
+        if (simulator)
+        {
+            if (loggedSimulatorState != (int)state)
+            {
+                loggedSimulatorState = (int)state;
+                var head = InputDevices.GetDeviceAtXRNode(XRNode.Head);
+                bool hasPresence = head.TryGetFeatureValue(UnityEngine.XR.CommonUsages.userPresence, out bool present);
+                bool hasTracking = head.TryGetFeatureValue(UnityEngine.XR.CommonUsages.isTracked, out bool tracked);
+                Debug.Log("WUKONG_SIM_STATE " + state + " focus=" + hasFocus + " sensorPresence=" + hasPresence + ":" + present
+                    + " sensorTracking=" + hasTracking + ":" + tracked + " songTime=" + SongTime.ToString("F2"));
+            }
+            // The emulator can deliver virtual controller keys as an Android
+            // gamepad rather than through the XR feature provider.
+            foreach (Gamepad pad in Gamepad.all)
+            {
+                primaryHeld |= pad.buttonSouth.isPressed;
+                secondaryHeldXr |= pad.buttonEast.isPressed;
+                languageHeld |= pad.buttonWest.isPressed;
+                Vector2 axis = pad.rightStick.ReadValue();
+                if (axis.sqrMagnitude < .1f) axis = pad.dpad.ReadValue();
+                if (axis.sqrMagnitude > stick.sqrMagnitude) stick = axis;
+            }
+        }
+
         bool keyboardPrimary = Keyboard.current != null
-            && (Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.tKey.wasPressedThisFrame);
-        bool keyboardSecondaryPressed = Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
-        bool keyboardSecondaryHeld = Keyboard.current != null && Keyboard.current.escapeKey.isPressed;
-        bool keyboardLanguage = Keyboard.current != null && Keyboard.current.lKey.wasPressedThisFrame;
+            && (Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.numpadEnterKey.wasPressedThisFrame
+                || Keyboard.current.tKey.wasPressedThisFrame);
+        bool keyboardSecondaryPressed = Keyboard.current != null && (Keyboard.current.escapeKey.wasPressedThisFrame);
+        bool keyboardSecondaryHeld = Keyboard.current != null && (Keyboard.current.escapeKey.isPressed);
+        bool keyboardLanguage = Keyboard.current != null && (Keyboard.current.lKey.wasPressedThisFrame
+            || (simulator && Keyboard.current.xKey.wasPressedThisFrame));
         primaryPressed = (primaryHeld && !previousPrimaryButton) || keyboardPrimary;
         secondaryPressed = (secondaryHeldXr && !previousSecondaryButton) || keyboardSecondaryPressed;
         secondaryHeld = secondaryHeldXr || keyboardSecondaryHeld;
@@ -761,6 +793,9 @@ public sealed class WukongRhythmGame : MonoBehaviour
         previousPrimaryButton = primaryHeld;
         previousSecondaryButton = secondaryHeldXr;
         previousLanguageButton = languageHeld;
+        if (simulator && (primaryPressed || secondaryPressed || languagePressed))
+            Debug.Log("WUKONG_INPUT state=" + state + " primary=" + primaryPressed + " secondary=" + secondaryPressed
+                + " language=" + languagePressed + " focus=" + hasFocus + " present=" + IsUserPresent());
     }
 
     private void TryMonsterAnimation(string stateName, float transition)

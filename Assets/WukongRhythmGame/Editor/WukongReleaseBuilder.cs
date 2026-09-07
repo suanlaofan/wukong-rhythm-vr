@@ -8,6 +8,7 @@ using UnityEngine;
 
 public static class WukongReleaseBuilder
 {
+    public const string Version = "1.1.0";
     [MenuItem("Wukong Rhythm/Build/Build Diagnostic APK")]
     public static void BuildDiagnostic() { Build(false); }
 
@@ -25,8 +26,9 @@ public static class WukongReleaseBuilder
 
         WukongRhythmValidation.Run();
         WukongRhythmGameBuilder.ConfigurePicoBuildSettings();
-        PlayerSettings.bundleVersion = "0.2.0";
-        PlayerSettings.Android.bundleVersionCode = Math.Max(2, PlayerSettings.Android.bundleVersionCode);
+        WukongAppIconConfigurator.Apply();
+        PlayerSettings.bundleVersion = Version;
+        PlayerSettings.Android.bundleVersionCode = Math.Max(3, PlayerSettings.Android.bundleVersionCode);
         EditorUserBuildSettings.development = false;
         EditorUserBuildSettings.allowDebugging = false;
         EditorUserBuildSettings.connectProfiler = false;
@@ -35,7 +37,7 @@ public static class WukongReleaseBuilder
         string output = Environment.GetEnvironmentVariable("WUKONG_BUILD_DIR");
         if (string.IsNullOrEmpty(output)) output = Path.GetFullPath("Builds/Remediation");
         Directory.CreateDirectory(output);
-        string path = Path.Combine(output, release ? "WukongRhythmVR-0.2.0-release.apk" : "WukongRhythmVR-0.2.0-validation.apk");
+        string path = Path.Combine(output, "WukongRhythmVR-" + Version + (release ? "-release.apk" : "-pico.apk"));
         var options = new BuildPlayerOptions
         {
             scenes = new[] { "Assets/Scenes/SampleScene.unity" },
@@ -49,7 +51,7 @@ public static class WukongReleaseBuilder
         using (SHA256 sha = SHA256.Create())
         using (FileStream input = File.OpenRead(path)) digest = BitConverter.ToString(sha.ComputeHash(input)).Replace("-", "").ToLowerInvariant();
         File.WriteAllText(path + ".sha256", digest + "  " + Path.GetFileName(path) + "\n");
-        File.WriteAllText(path + ".build.txt", "version=0.2.0\nversionCode=" + PlayerSettings.Android.bundleVersionCode
+        File.WriteAllText(path + ".build.txt", "version=" + Version + "\nversionCode=" + PlayerSettings.Android.bundleVersionCode
             + "\npackage=" + PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android)
             + "\nrelease=" + release + "\nsha256=" + digest
             + "\nDevice and platform signature acceptance must be verified separately.\n");

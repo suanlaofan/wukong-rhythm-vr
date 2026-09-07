@@ -45,6 +45,7 @@ public static class WukongRhythmValidation
         ValidateStrikeConsumption();
         ValidateBeatTimeline();
         ValidateEarlyContactRetry();
+        ValidateSimulatorInput();
         string directory = Environment.GetEnvironmentVariable("WUKONG_AUDIT_DIR");
         if (string.IsNullOrEmpty(directory)) directory = Path.GetFullPath("Logs/WukongValidation");
         Directory.CreateDirectory(directory);
@@ -177,6 +178,29 @@ public static class WukongRhythmValidation
         {
             if(ring!=null) UnityEngine.Object.DestroyImmediate(ring.gameObject);
             UnityEngine.Object.DestroyImmediate(rockObject);
+            UnityEngine.Object.DestroyImmediate(root);
+        }
+    }
+    private static void ValidateSimulatorInput()
+    {
+        var root = new GameObject("Simulator Presence Regression");
+        var environment = typeof(WukongRuntimeEnvironment).GetField("emulator", BindingFlags.Static | BindingFlags.NonPublic);
+        object originalEnvironment = environment.GetValue(null);
+        try
+        {
+            var game = root.AddComponent<WukongRhythmGame>();
+            environment.SetValue(null, (bool?)true);
+            Check((bool)typeof(WukongRhythmGame).GetMethod("IsUserPresent", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(game, null), "emulator without wear sensor can play and resume");
+            foreach (WukongRhythmGame.BattleState state in Enum.GetValues(typeof(WukongRhythmGame.BattleState)))
+            foreach (bool zh in new[] {true, false})
+            {
+                string hint = WukongControlsGuide.SimulatorBindings(state, zh);
+                Check(!string.IsNullOrEmpty(hint) && !hint.Contains("\n"), "emulator hint remains one compact row");
+            }
+        }
+        finally
+        {
+            environment.SetValue(null, originalEnvironment);
             UnityEngine.Object.DestroyImmediate(root);
         }
     }
