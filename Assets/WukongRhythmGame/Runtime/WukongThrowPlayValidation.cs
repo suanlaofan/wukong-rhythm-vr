@@ -76,7 +76,7 @@ public sealed class WukongThrowPlayValidation : MonoBehaviour
         Check(guide.bindingsLabel.text.Contains("选曲")||guide.bindingsLabel.text.Contains("SELECT"),"persistent guide switches to song selection controls");
         string dir=Path.Combine(Environment.GetEnvironmentVariable("WUKONG_AUDIT_DIR")??"Logs/WukongValidation","throw-ui");
         Directory.CreateDirectory(dir);
-        File.WriteAllText(Path.Combine(dir,"throw-play-validation.json"),Newtonsoft.Json.JsonConvert.SerializeObject(new {status="PASS",checks,utc=DateTime.UtcNow},Newtonsoft.Json.Formatting.Indented));
+        File.WriteAllText(Path.Combine(dir,"throw-play-validation.json"),JsonUtility.ToJson(new ValidationReport { checks=checks, utc=DateTime.UtcNow.ToString("O") },true));
         Debug.Log("WUKONG_THROW_PLAY_PASS checks="+checks.Count);
         Destroy(gameObject);
     }
@@ -103,6 +103,13 @@ public sealed class WukongThrowPlayValidation : MonoBehaviour
     {
         if(!value)throw new InvalidOperationException("WUKONG_THROW_PLAY_FAIL "+message);
         checks.Add(message);
+    }
+    [Serializable]
+    private sealed class ValidationReport
+    {
+        public string status="PASS";
+        public List<string> checks;
+        public string utc;
     }
     private static object Get(object o,string n)=>o.GetType().GetField(n,Flags).GetValue(o);
     private static void Set(object o,string n,object v)=>o.GetType().GetField(n,Flags).SetValue(o,v);

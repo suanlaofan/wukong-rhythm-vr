@@ -98,9 +98,17 @@ public sealed class WukongRhythmRepairPlayValidation : MonoBehaviour
         Invoke(game,"ReturnToSongSelection");
         string dir=Path.Combine(Environment.GetEnvironmentVariable("WUKONG_AUDIT_DIR")??"Logs/WukongValidation","rhythm-fix");
         Directory.CreateDirectory(dir);
-        File.WriteAllText(Path.Combine(dir,"repair-play-validation.json"),Newtonsoft.Json.JsonConvert.SerializeObject(new {status="PASS",checks,actualError,impactOutputPeak=peak,song=song.songId,utc=DateTime.UtcNow},Newtonsoft.Json.Formatting.Indented));
+        File.WriteAllText(Path.Combine(dir,"repair-play-validation.json"),JsonUtility.ToJson(new ValidationReport { checks=checks, actualError=actualError, impactOutputPeak=peak, song=song.songId, utc=DateTime.UtcNow.ToString("O") },true));
         Debug.Log("WUKONG_RHYTHM_REPAIR_PLAY_PASS checks="+checks.Count);
         Destroy(gameObject);
+    }
+    [Serializable]
+    private sealed class ValidationReport
+    {
+        public string status="PASS";
+        public List<string> checks;
+        public float actualError, impactOutputPeak;
+        public string song, utc;
     }
     private static void SetContact(WukongStaffController staff,WukongBeatRock rock,WukongRhythmGame game,int action)
     {
