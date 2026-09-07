@@ -34,7 +34,7 @@ public static class WukongRhythmGameBuilder
     private const string GeneratedRoot = GameRoot + "/Generated";
     private const string FontsRoot = GameRoot + "/Fonts";
     // Keep the expanded 1.5x panel fully inside the right side of the headset view.
-    private static readonly Vector3 UnifiedHudOffset = new Vector3(1.05f, 0.04f, 1.85f);
+    private static readonly Vector3 UnifiedHudOffset = new Vector3(1.05f, 0.16f, 1.85f);
     private const float UnifiedHudPixelsToMeters = 0.001425f;
 
     [MenuItem("Tools/Wukong/Build PICO Rhythm Battle")]
@@ -379,7 +379,7 @@ public static class WukongRhythmGameBuilder
         {
             // Keep the controller-led staff fully inside the first-person view
             // while leaving enough reach for comfortable, low-amplitude swings.
-            float factor = Mathf.Clamp(0.58f / currentLength, 0.08f, 8f);
+            float factor = Mathf.Clamp(0.725f / currentLength, 0.08f, 8f);
             staff.transform.localScale *= factor;
         }
 
@@ -760,6 +760,34 @@ public static class WukongRhythmGameBuilder
         hud.resultBreakdown = resultBreakdown;
         hud.resultHint = resultHint;
         game.hud = hud;
+        BuildControlsGuide(spatialRoot.transform,camera,font,game);
+    }
+
+    public static void BuildControlsGuide(Transform parent,Camera camera,Font font,WukongRhythmGame game)
+    {
+        var existing=parent.Find("Global Controls Guide");
+        if(existing!=null) UnityEngine.Object.DestroyImmediate(existing.gameObject);
+        var panel=CreateSpatialPanel("Global Controls Guide",parent,camera,new Vector3(0f,-.86f,1.95f),new Vector2(1500,190),.00115f,70);
+        panel.GetComponent<WukongSpatialUi>().followPosition=true;
+        panel.GetComponent<WukongSpatialUi>().initializePosition=false;
+        var content=new GameObject("Guide Content",typeof(RectTransform)).GetComponent<RectTransform>();
+        content.SetParent(panel.transform,false);
+        SetRect(content,Vector2.one*.5f,Vector2.one*.5f,Vector2.one*.5f,Vector2.zero,new Vector2(1500,190));
+        var background=CreateImage("Guide Backplate",content,new Color(.018f,.055f,.075f,.86f));
+        Stretch(background.rectTransform); background.raycastTarget=false;
+        var accent=CreateImage("Guide Accent",content,new Color(.36f,.92f,1f,.75f));
+        SetRect(accent.rectTransform,Vector2.one*.5f,Vector2.one*.5f,Vector2.one*.5f,new Vector2(0,92),new Vector2(1500,3));
+        accent.raycastTarget=false;
+        var title=CreateText("Controls Title",content,font,22,TextAnchor.MiddleCenter,new Color(.5f,.91f,1f));
+        SetRect(title.rectTransform,Vector2.one*.5f,Vector2.one*.5f,Vector2.one*.5f,new Vector2(0,55),new Vector2(1440,36));
+        var bindings=CreateText("Controls Bindings",content,font,28,TextAnchor.MiddleCenter,new Color(.93f,.98f,1f));
+        SetRect(bindings.rectTransform,Vector2.one*.5f,Vector2.one*.5f,Vector2.one*.5f,new Vector2(0,-20),new Vector2(1440,105));
+        title.raycastTarget=false;bindings.raycastTarget=false;
+        bindings.resizeTextForBestFit=true;bindings.resizeTextMinSize=22;bindings.resizeTextMaxSize=28;
+        var guide=panel.AddComponent<WukongControlsGuide>();guide.game=game;guide.titleLabel=title;guide.bindingsLabel=bindings;
+        guide.contentRoot=content;
+        title.text="操作提示 · 键盘与鼠标";
+        bindings.text=WukongControlsGuide.Bindings(WukongRhythmGame.BattleState.SongSelect,false,true);
     }
 
     private static Texture2D LoadGlassTexture(string sourceFileName, string generatedFileName)

@@ -70,12 +70,23 @@ public sealed class WukongBeatRock : MonoBehaviour
         {
             // Positive calibration moves an input later on the music timeline.
             float error = (float)(game.MusicTimeAtDsp(contactDsp) + game.inputTimingOffsetSeconds - targetSongTime);
+            bool thrown = staff.IsThrown;
+            if (thrown) error = staff.ThrowTimingError(this, error);
             WukongTimingGrade grade = WukongRhythmTiming.Judge(error, game.PerfectWindow, game.hitWindow);
-            if ((grade == WukongTimingGrade.Perfect || grade == WukongTimingGrade.Good) && staff.ConsumeSwing(actionId))
+            bool onBeat = grade == WukongTimingGrade.Perfect || grade == WukongTimingGrade.Good;
+            if ((onBeat || thrown) && staff.ConsumeSwing(actionId))
             {
                 resolved = true;
-                warningRing.CompleteHit(grade == WukongTimingGrade.Perfect);
-                game.ResolveHit(this, error);
+                if (onBeat)
+                {
+                    warningRing.CompleteHit(grade == WukongTimingGrade.Perfect);
+                    game.ResolveHit(this, error);
+                }
+                else
+                {
+                    warningRing.CompleteMiss();
+                    game.ResolveMiss(this);
+                }
                 game.SpawnRockExplosion(transform.position, spellRock);
                 game.RecycleRock(this);
                 return;
@@ -84,7 +95,8 @@ public sealed class WukongBeatRock : MonoBehaviour
         }
         // Consume this frame's swept contacts before expiring a note. Offset must
         // also shift expiry, otherwise a negative input correction loses late hits.
-        if (game.SongTime + game.inputTimingOffsetSeconds > targetSongTime + game.hitWindow)
+        if (game.SongTime + game.inputTimingOffsetSeconds > targetSongTime + game.hitWindow
+            && (staff == null || !staff.KeepsThrowTargetAlive(this)))
         {
             resolved = true;
             warningRing.CompleteMiss();

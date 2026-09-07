@@ -699,18 +699,14 @@ public sealed class WukongRhythmGame : MonoBehaviour
 
             Vector3 offset = rock.transform.position - origin;
             float distance = offset.magnitude;
-            if (distance > staff.maximumThrowDistance + 0.6f || distance < 0.1f)
+            if (distance > staff.maximumThrowDistance || Vector3.Dot(playerCamera.transform.forward, rock.transform.position-playerCamera.transform.position) < .1f)
             {
                 continue;
             }
-            float facing = Vector3.Dot(playerCamera.transform.forward, offset / distance);
-            if (facing < 0.18f)
-            {
-                continue;
-            }
-
             float timing = Mathf.Abs(rock.TargetSongTime - SongTime);
-            float candidateScore = distance + (1f - facing) * 2f + timing * 0.08f;
+            // Prefer the imminent beat; close targets beside the hand must not
+            // disappear from selection because they are behind the grip pivot.
+            float candidateScore = timing * 3f + distance * .15f;
             if (candidateScore < bestScore)
             {
                 bestScore = candidateScore;

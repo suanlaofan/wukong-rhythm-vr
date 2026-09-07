@@ -341,9 +341,9 @@ public sealed class WukongRhythmHud : MonoBehaviour
 
     private void RefreshSongSelectionText()
     {
-        SetText(songSelectHint, Localize(
-            "UP / DOWN  SELECT     A  START\nX / L  中文",
-            "上 / 下  选择     A  开始\nX / L  ENGLISH"));
+        SetText(songSelectHint, UnityEngine.XR.XRSettings.isDeviceActive
+            ? Localize("STICK UP / DOWN SELECT   A START\nX 中文","摇杆上 / 下选择   A 开始\nX ENGLISH")
+            : Localize("UP / DOWN SELECT   ENTER / T START\nL 中文","↑ / ↓ 选择   Enter / T 开始\nL ENGLISH"));
 
         for (int i = 0; i < (songRows != null ? songRows.Length : 0); i++)
         {
@@ -422,9 +422,9 @@ public sealed class WukongRhythmHud : MonoBehaviour
         SetText(resultBreakdown, Localize(
             "PERFECT " + resultPerfectValue + "    GOOD " + resultGoodValue + "    MISS " + resultMissValue,
             "完美 " + resultPerfectValue + "    良好 " + resultGoodValue + "    失误 " + resultMissValue));
-        SetText(resultHint, Localize(
-            "A  REPLAY     B  SELECT MUSIC\nX / L  中文",
-            "A  再来一局     B  选择音乐\nX / L  ENGLISH"));
+        SetText(resultHint, UnityEngine.XR.XRSettings.isDeviceActive
+            ? Localize("A REPLAY   B SELECT MUSIC\nX 中文","A 再来一局   B 选择音乐\nX ENGLISH")
+            : Localize("ENTER / T / R REPLAY   ESC MUSIC\nL 中文","Enter / T / R 重玩   Esc 选曲\nL ENGLISH"));
     }
 
     private string RatingText(WukongHudRating rating)

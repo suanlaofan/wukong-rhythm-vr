@@ -59,6 +59,9 @@ public sealed class WukongStaffController : MonoBehaviour
     private Vector3 returnStartPosition;
     private Quaternion throwStartRotation;
     private float throwStateStarted;
+    private double throwStartedDsp;
+    private WukongBeatRock aimedRock;
+    private float aimedRockTime;
 
     public float SwingSpeed => swingSpeed;
     public bool IsThrown => throwState != ThrowState.Held;
@@ -66,6 +69,18 @@ public sealed class WukongStaffController : MonoBehaviour
     public double SampleDsp => sampleDsp;
     public double PreviousSampleDsp => previousSampleDsp;
     public bool HasTrackedHand => usingXr;
+    public bool IsThrowingAt(WukongBeatRock rock) => IsThrown && aimedRock == rock
+        && rock != null && !rock.IsResolved && Mathf.Abs(rock.TargetSongTime - aimedRockTime) < .0001f;
+    public bool KeepsThrowTargetAlive(WukongBeatRock rock) => throwState == ThrowState.Outbound
+        && IsThrowingAt(rock) && AudioSettings.dspTime <= throwStartedDsp + outboundDuration + .1f;
+    public float ThrowTimingError(WukongBeatRock rock, float impactError)
+    {
+        if (!IsThrowingAt(rock) || game == null) return impactError;
+        float launchError=(float)(game.MusicTimeAtDsp(throwStartedDsp)+game.inputTimingOffsetSeconds-rock.TargetSongTime);
+        // Either a rhythmic release or a rhythmic impact earns the timing grade.
+        // Travel time must not make an on-beat button press impossible to score.
+        return Mathf.Abs(launchError)<Mathf.Abs(impactError)?launchError:impactError;
+    }
     public void BindGame(WukongRhythmGame owner) { game = owner; }
 
     private void Awake()
@@ -393,10 +408,17 @@ public sealed class WukongStaffController : MonoBehaviour
         }
 
         throwTarget = target;
+        aimedRock = target != null ? target.GetComponent<WukongBeatRock>() : null;
+        aimedRockTime = aimedRock != null ? aimedRock.TargetSongTime : -1f;
         throwStartPosition = transform.position;
         throwStartRotation = transform.rotation;
         throwDestination = ResolveThrowDestination(target);
         throwStateStarted = Time.unscaledTime;
+        throwStartedDsp = AudioSettings.dspTime;
+        ResetContactHistory();
+        swingId++;
+        swingActive = true;
+        swingStartedDsp = throwStartedDsp;
         throwState = ThrowState.Outbound;
         swingTime = -1f;
         transform.SetParent(null, true);
@@ -405,6 +427,7 @@ public sealed class WukongStaffController : MonoBehaviour
             swingTrail.emitting = true;
         }
         SendHaptic(0.28f, 0.045f);
+        PlayWhoosh();
         return true;
     }
 
@@ -412,6 +435,7 @@ public sealed class WukongStaffController : MonoBehaviour
     {
         throwState = ThrowState.Held;
         throwTarget = null;
+        aimedRock = null;
         if (handAnchor != null)
         {
             transform.SetParent(handAnchor, false);
@@ -431,7 +455,7 @@ public sealed class WukongStaffController : MonoBehaviour
         if (throwState == ThrowState.Outbound)
         {
             float t = Mathf.Clamp01((Time.unscaledTime - throwStateStarted) / Mathf.Max(0.1f, outboundDuration));
-            if (throwTarget != null)
+            if (throwTarget != null && (aimedRock == null || IsThrowingAt(aimedRock)))
             {
                 throwDestination = ResolveThrowDestination(throwTarget);
             }
