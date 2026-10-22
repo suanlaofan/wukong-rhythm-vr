@@ -75,8 +75,6 @@ public static class WukongBeatmapGenerator
             defaultSong.songId = "fantasy_battle_suspense";
             defaultSong.title = "Fantasy Battle Suspense";
             defaultSong.artist = "Wukong Rhythm Studio";
-            defaultSong.titleZh = "幻想战斗悬念曲";
-            defaultSong.artistZh = "悟空节奏工作室";
             defaultSong.audioClip = defaultClip;
             defaultSong.bpm = 120f;
             defaultSong.beatOffsetSeconds = 0f;

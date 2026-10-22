@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: classic_dubstep_neon_static
   title: Classic Dubstep - Neon Static
   artist: EDM Test Collection
-  titleZh: Classic Dubstep - Neon Static
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: cca8e18c7392e46c9a94a3b5a8dd1094, type: 3}
   previewClip: {fileID: 0}
   bpm: 149.5929

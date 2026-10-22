@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: dnb_neon_pulse
   title: DnB - Neon Pulse
   artist: EDM Test Collection
-  titleZh: DnB - Neon Pulse
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: ff8e5e3038fe24fc39a4b68013907a9c, type: 3}
   previewClip: {fileID: 0}
   bpm: 116.5433

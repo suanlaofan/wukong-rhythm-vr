@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: uplifting_trance_neon_static
   title: Uplifting Trance - Neon Static
   artist: EDM Test Collection
-  titleZh: Uplifting Trance - Neon Static
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: fce04c7dcf94c41e78aff3b856f84a3a, type: 3}
   previewClip: {fileID: 0}
   bpm: 87.5927

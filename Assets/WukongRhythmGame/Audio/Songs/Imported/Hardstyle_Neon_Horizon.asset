@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: hardstyle_neon_horizon
   title: Hardstyle - Neon Horizon
   artist: EDM Test Collection
-  titleZh: Hardstyle - Neon Horizon
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: 6fb25d4a761c84010b3d32ba43500602, type: 3}
   previewClip: {fileID: 0}
   bpm: 149.7962

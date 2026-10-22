@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: melodic_techno_midnight_pulse
   title: Melodic Techno - Midnight Pulse
   artist: EDM Test Collection
-  titleZh: Melodic Techno - Midnight Pulse
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: 68248938c8062466096048caaff5a06f, type: 3}
   previewClip: {fileID: 0}
   bpm: 127.469

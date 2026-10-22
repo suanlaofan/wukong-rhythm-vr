@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: festival_house_neon_horizon
   title: Festival House - Neon Horizon
   artist: EDM Test Collection
-  titleZh: Festival House - Neon Horizon
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: d2bc9d501ff094bbfbcfcb58a5a4dec0, type: 3}
   previewClip: {fileID: 0}
   bpm: 130.8347

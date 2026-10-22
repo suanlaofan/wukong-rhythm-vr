@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: cute_future_bass_neon_heartbeat
   title: Cute Future Bass - Neon Heartbeat
   artist: EDM Test Collection
-  titleZh: "\u840C\u840C Future Bass - Neon Heartbeat"
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: e36ae5ae8e3db4cf0972bad5b84a120c, type: 3}
   previewClip: {fileID: 0}
   bpm: 120.1853

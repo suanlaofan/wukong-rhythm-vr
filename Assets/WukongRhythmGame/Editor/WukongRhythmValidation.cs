@@ -192,9 +192,8 @@ public static class WukongRhythmValidation
             environment.SetValue(null, (bool?)true);
             Check((bool)typeof(WukongRhythmGame).GetMethod("IsUserPresent", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(game, null), "emulator without wear sensor can play and resume");
             foreach (WukongRhythmGame.BattleState state in Enum.GetValues(typeof(WukongRhythmGame.BattleState)))
-            foreach (bool zh in new[] {true, false})
             {
-                string hint = WukongControlsGuide.SimulatorBindings(state, zh);
+                string hint = WukongControlsGuide.SimulatorBindings(state);
                 Check(!string.IsNullOrEmpty(hint) && !hint.Contains("\n"), "emulator hint remains one compact row");
             }
         }

@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: melodic_dubstep_midnight_supersaw
   title: Melodic Dubstep - Midnight Supersaw
   artist: EDM Test Collection
-  titleZh: Melodic Dubstep - Midnight Supersaw
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: 452029e45111f4822adff7160273936e, type: 3}
   previewClip: {fileID: 0}
   bpm: 149.7962

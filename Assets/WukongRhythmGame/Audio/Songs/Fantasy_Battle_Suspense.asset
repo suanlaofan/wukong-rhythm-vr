@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: fantasy_battle_suspense
   title: Fantasy Battle Suspense
   artist: Wukong Rhythm Studio
-  titleZh: "\u5E7B\u60F3\u6218\u6597\u60AC\u5FF5\u66F2"
-  artistZh: "\u609F\u7A7A\u8282\u594F\u5DE5\u4F5C\u5BA4"
   audioClip: {fileID: 8300000, guid: 7ee7ce4c046c3465ab6e9aa5f97f9ec1, type: 3}
   previewClip: {fileID: 0}
   bpm: 118.3681

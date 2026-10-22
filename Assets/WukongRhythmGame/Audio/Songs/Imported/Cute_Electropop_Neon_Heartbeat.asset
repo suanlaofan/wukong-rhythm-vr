@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: cute_electropop_neon_heartbeat
   title: Cute Electropop - Neon Heartbeat
   artist: EDM Test Collection
-  titleZh: "\u840C\u840C Electropop - Neon Heartbeat"
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: 3fa05877926914f84b1292e0aed17f4e, type: 3}
   previewClip: {fileID: 0}
   bpm: 108.1589

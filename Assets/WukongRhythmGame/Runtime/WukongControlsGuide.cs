@@ -13,25 +13,23 @@ public sealed class WukongControlsGuide : MonoBehaviour
     public RectTransform contentRoot;
     private int previousState = -1;
     private int previousOffset = int.MinValue;
-    private bool previousChinese, previousXr;
+    private bool previousXr;
 
     private void LateUpdate()
     {
         if (game == null || game.hud == null) return;
-        bool chinese = game.hud.IsChinese;
         bool xr = UnityEngine.XR.XRSettings.isDeviceActive;
         int offset = Mathf.RoundToInt(game.inputTimingOffsetSeconds * 1000f);
         if (previousState < 0 || xr != previousXr) ConfigurePresentation(xr);
-        if (previousState == (int)game.State && chinese == previousChinese && xr == previousXr && offset == previousOffset) return;
+        if (previousState == (int)game.State && xr == previousXr && offset == previousOffset) return;
         previousState = (int)game.State;
-        previousChinese = chinese;
         previousXr = xr;
         previousOffset = offset;
         if (bindingsLabel != null)
         {
-            bindingsLabel.text = Bindings(game.State, xr, chinese);
+            bindingsLabel.text = Bindings(game.State, xr);
             if (WukongRuntimeEnvironment.IsEmulator)
-                bindingsLabel.text = SimulatorBindings(game.State, chinese);
+                bindingsLabel.text = SimulatorBindings(game.State);
             if (game.State == WukongRhythmGame.BattleState.Paused)
                 bindingsLabel.text += " " + offset.ToString("+0;-0;0") + " ms";
         }
@@ -65,48 +63,40 @@ public sealed class WukongControlsGuide : MonoBehaviour
         }
     }
 
-    public static string Bindings(WukongRhythmGame.BattleState state, bool xr, bool zh)
+    public static string Bindings(WukongRhythmGame.BattleState state, bool xr)
     {
         switch (state)
         {
             case WukongRhythmGame.BattleState.SongSelect:
-                return xr
-                    ? (zh ? "右摇杆选曲   A 开始   X 中英" : "STICK SELECT   A START   X LANGUAGE")
-                    : (zh ? "↑↓ 选曲   Enter 开始   L 中英" : "↑↓ SELECT   ENTER START   L LANGUAGE");
+                return xr ? "STICK SELECT   A START" : "↑↓ SELECT   ENTER START";
             case WukongRhythmGame.BattleState.Paused:
-                return xr
-                    ? (zh ? "A 继续   长按 B 选曲   摇杆 ←→ 校准" : "A RESUME   HOLD B MUSIC   STICK ←→ CALIBRATE")
-                    : (zh ? "Enter 继续   长按 Esc 选曲   ←→ 校准" : "ENTER RESUME   HOLD ESC MUSIC   ←→ CALIBRATE");
+                return xr ? "A RESUME   HOLD B MUSIC   STICK ←→ CALIBRATE" : "ENTER RESUME   HOLD ESC MUSIC   ←→ CALIBRATE";
             case WukongRhythmGame.BattleState.Results:
-                return xr
-                    ? (zh ? "A 重玩   B 选曲   X 中英" : "A REPLAY   B MUSIC   X LANGUAGE")
-                    : (zh ? "R 重玩   Esc 选曲   L 中英" : "R REPLAY   ESC MUSIC   L LANGUAGE");
+                return xr ? "A REPLAY   B MUSIC" : "R REPLAY   ESC MUSIC";
             case WukongRhythmGame.BattleState.CountIn:
             case WukongRhythmGame.BattleState.Resuming:
-                return zh ? "跟随倒计时，准备出手" : "FOLLOW THE COUNT-IN · GET READY";
+                return "FOLLOW THE COUNT-IN · GET READY";
             case WukongRhythmGame.BattleState.Ending:
-                return zh ? "曲目结束，正在结算" : "TRACK COMPLETE · RESULTS COMING";
+                return "TRACK COMPLETE · RESULTS COMING";
             default:
-                return xr
-                    ? (zh ? "挥动右手击打   A 投掷   B 暂停" : "SWING TO STRIKE   A THROW   B PAUSE")
-                    : (zh ? "鼠标移棒   左键/空格击打   T 投掷   Esc 暂停" : "MOUSE MOVE   CLICK/SPACE STRIKE   T THROW   ESC PAUSE");
+                return xr ? "SWING TO STRIKE   A THROW   B PAUSE" : "MOUSE MOVE   CLICK/SPACE STRIKE   T THROW   ESC PAUSE";
         }
     }
 
-    public static string SimulatorBindings(WukongRhythmGame.BattleState state, bool zh)
+    public static string SimulatorBindings(WukongRhythmGame.BattleState state)
     {
         switch (state)
         {
             case WukongRhythmGame.BattleState.SongSelect:
-                return zh ? "I/K 选曲   空格(A) 开始   X 中英" : "I/K SELECT   SPACE (A) START   X LANGUAGE";
+                return "I/K SELECT   SPACE (A) START";
             case WukongRhythmGame.BattleState.Paused:
-                return zh ? "空格 继续   长按 Delete 选曲   J/L 校准" : "SPACE RESUME   HOLD DELETE MUSIC   J/L CALIBRATE";
+                return "SPACE RESUME   HOLD DELETE MUSIC   J/L CALIBRATE";
             case WukongRhythmGame.BattleState.Results:
-                return zh ? "空格 重玩   Delete 选曲   X 中英" : "SPACE REPLAY   DELETE MUSIC   X LANGUAGE";
+                return "SPACE REPLAY   DELETE MUSIC";
             case WukongRhythmGame.BattleState.Playing:
-                return zh ? "鼠标移动右手   空格 投掷   Delete 暂停" : "MOUSE MOVE RIGHT HAND   SPACE THROW   DELETE PAUSE";
+                return "MOUSE MOVE RIGHT HAND   SPACE THROW   DELETE PAUSE";
             default:
-                return Bindings(state, true, zh);
+                return Bindings(state, true);
         }
     }
 }

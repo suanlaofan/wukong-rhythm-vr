@@ -13,8 +13,6 @@ public enum WukongHudRating
 
 public sealed class WukongRhythmHud : MonoBehaviour
 {
-    private const string LanguagePreferenceKey = "Wukong.UiLanguage";
-
     private enum HudMode
     {
         SongSelect,
@@ -78,7 +76,6 @@ public sealed class WukongRhythmHud : MonoBehaviour
     private WukongHudRating activeRating;
     private float ratingHideAt;
     private float ratingAnimationStarted;
-    private bool isChinese;
     private bool hasGameplaySnapshot;
     private int displayedSelectedIndex;
     private int countInValue = -1;
@@ -98,11 +95,8 @@ public sealed class WukongRhythmHud : MonoBehaviour
     private int resultGoodValue;
     private int resultMissValue;
 
-    public bool IsChinese => isChinese;
-
     private void Awake()
     {
-        isChinese = PlayerPrefs.GetInt(LanguagePreferenceKey, 0) == 1;
         ratingGroup = ratingLabel != null ? ratingLabel.GetComponentInParent<CanvasGroup>() : null;
         if (ratingGroup == null && ratingLabel != null)
         {
@@ -136,14 +130,6 @@ public sealed class WukongRhythmHud : MonoBehaviour
         {
             ClearRating();
         }
-    }
-
-    public void ToggleLanguage()
-    {
-        isChinese = !isChinese;
-        PlayerPrefs.SetInt(LanguagePreferenceKey, isChinese ? 1 : 0);
-        PlayerPrefs.Save();
-        RefreshLocalizedText();
     }
 
     public void ShowSongSelect(IList<WukongSongDefinition> songs, int selectedIndex)
@@ -180,7 +166,7 @@ public sealed class WukongRhythmHud : MonoBehaviour
         countInValue = count;
         if (phaseValue != null)
         {
-            phaseValue.text = Localize("READY  " + count, "准备  " + count);
+            phaseValue.text = "READY  " + count;
         }
     }
 
@@ -191,8 +177,8 @@ public sealed class WukongRhythmHud : MonoBehaviour
         if (comboValue != null && (first || cachedCombo != combo)) comboValue.text = combo.ToString("D3");
         if (accuracyValue != null && (first || Mathf.RoundToInt(cachedAccuracy) != Mathf.RoundToInt(accuracy))) accuracyValue.text = accuracy.ToString("0") + "%";
         if (bpmValue != null && (first || !Mathf.Approximately(cachedBpm, bpm))) bpmValue.text = "BPM " + bpm.ToString("0");
-        if (beatValue != null && (first || Mathf.FloorToInt(cachedBeat) != Mathf.FloorToInt(beat))) beatValue.text = Localize("BEAT ", "节拍 ") + (Mathf.FloorToInt(beat) + 1);
-        if (phaseValue != null && (first || countInValue > 0 || cachedPhase != phase)) phaseValue.text = Localize("PHASE ", "阶段 ") + phase;
+        if (beatValue != null && (first || Mathf.FloorToInt(cachedBeat) != Mathf.FloorToInt(beat))) beatValue.text = "BEAT " + (Mathf.FloorToInt(beat) + 1);
+        if (phaseValue != null && (first || countInValue > 0 || cachedPhase != phase)) phaseValue.text = "PHASE " + phase;
         if (beatProgress != null) beatProgress.fillAmount = Mathf.Clamp01(beatProgressValue);
         cachedScore = score; cachedCombo = combo; cachedAccuracy = accuracy;
         cachedPhase = phase; cachedBpm = bpm; cachedBeat = beat;
@@ -225,16 +211,14 @@ public sealed class WukongRhythmHud : MonoBehaviour
     {
         pausedOverlay = true; displayedOffset = offset;
         ClearRating();
-        SetText(phaseValue, Localize("PAUSED", "已暂停"));
-        SetText(operationHint, Localize(
-            "A / ENTER  RESUME     HOLD B / ESC  MUSIC\nLEFT / RIGHT  TIMING ",
-            "A / 回车  继续     长按 B / ESC  选歌\n左右拨杆 / 方向键  时间补偿 ") + (offset * 1000f).ToString("+0;-0;0") + " ms");
+        SetText(phaseValue, "PAUSED");
+        SetText(operationHint, "A / ENTER  RESUME     HOLD B / ESC  MUSIC\nLEFT / RIGHT  TIMING " + (offset * 1000f).ToString("+0;-0;0") + " ms");
     }
 
     public void ShowTimingDetail(float error)
     {
         if (ratingLabel != null && activeRating == WukongHudRating.Good)
-            ratingLabel.text = RatingText(activeRating) + (error < 0 ? Localize(" · EARLY", " · 偏早") : Localize(" · LATE", " · 偏晚"));
+            ratingLabel.text = RatingText(activeRating) + (error < 0 ? " · EARLY" : " · LATE");
     }
 
     public void ShowRating(WukongHudRating rating, float duration)
@@ -298,23 +282,23 @@ public sealed class WukongRhythmHud : MonoBehaviour
         if (ratingIdleLabel != null)
         {
             ratingIdleLabel.gameObject.SetActive(true);
-            ratingIdleLabel.text = Localize("RHYTHM READY", "节奏就绪");
+            ratingIdleLabel.text = "RHYTHM READY";
         }
     }
 
     private void RefreshLocalizedText()
     {
         forceGameplayText = true;
-        SetText(musicLibraryLabel, Localize("MUSIC LIBRARY", "音乐列表"));
-        SetText(songSelectTitle, Localize("SELECT MUSIC", "选择音乐"));
-        SetText(songSelectSubtitle, Localize("CHOOSE A TRACK TO BEGIN", "选择曲目开始游戏"));
-        SetText(nowPlayingLabel, Localize("NOW PLAYING", "正在播放"));
-        SetText(scoreCaption, Localize("SCORE", "得分"));
-        SetText(comboCaption, Localize("COMBO", "连击"));
-        SetText(accuracyCaption, Localize("TIMING", "节奏准确度"));
-        SetText(rhythmCaption, Localize("RHYTHM", "节奏"));
-        SetText(operationCaption, Localize("CONTROLS", "操作"));
-        SetText(resultEyebrow, Localize("SESSION RESULTS", "本局结算"));
+        SetText(musicLibraryLabel, "MUSIC LIBRARY");
+        SetText(songSelectTitle, "SELECT MUSIC");
+        SetText(songSelectSubtitle, "CHOOSE A TRACK TO BEGIN");
+        SetText(nowPlayingLabel, "NOW PLAYING");
+        SetText(scoreCaption, "SCORE");
+        SetText(comboCaption, "COMBO");
+        SetText(accuracyCaption, "TIMING");
+        SetText(rhythmCaption, "RHYTHM");
+        SetText(operationCaption, "CONTROLS");
+        SetText(resultEyebrow, "SESSION RESULTS");
 
         switch (mode)
         {
@@ -331,7 +315,7 @@ public sealed class WukongRhythmHud : MonoBehaviour
 
         if (activeRating == WukongHudRating.None)
         {
-            SetText(ratingIdleLabel, Localize("RHYTHM READY", "节奏就绪"));
+            SetText(ratingIdleLabel, "RHYTHM READY");
         }
         else
         {
@@ -342,8 +326,8 @@ public sealed class WukongRhythmHud : MonoBehaviour
     private void RefreshSongSelectionText()
     {
         SetText(songSelectHint, UnityEngine.XR.XRSettings.isDeviceActive
-            ? Localize("STICK UP / DOWN SELECT   A START\nX 中文","摇杆上 / 下选择   A 开始\nX ENGLISH")
-            : Localize("UP / DOWN SELECT   ENTER / T START\nL 中文","↑ / ↓ 选择   Enter / T 开始\nL ENGLISH"));
+            ? "STICK UP / DOWN SELECT   A START"
+            : "UP / DOWN SELECT   ENTER / T START");
 
         for (int i = 0; i < (songRows != null ? songRows.Length : 0); i++)
         {
@@ -362,7 +346,7 @@ public sealed class WukongRhythmHud : MonoBehaviour
 
             WukongSongDefinition song = displayedSongs[songIndex];
             row.text = (songIndex == displayedSelectedIndex ? "> " : "  ")
-                + song.LocalizedTitle(isChinese) + "   " + song.bpm.ToString("0") + " BPM";
+                + song.title + "   " + song.bpm.ToString("0") + " BPM";
             row.color = songIndex == displayedSelectedIndex
                 ? new Color(0.62f, 0.95f, 1f, 1f)
                 : new Color(0.9f, 0.94f, 1f, 0.78f);
@@ -374,27 +358,25 @@ public sealed class WukongRhythmHud : MonoBehaviour
         }
 
         songDetails.text = displayedSong == null
-            ? Localize("NO SONG MAP", "暂无谱面")
-            : displayedSong.LocalizedArtist(isChinese) + "\n"
+            ? "NO SONG MAP"
+            : displayedSong.artist + "\n"
                 + displayedSong.bpm.ToString("0") + " BPM   "
-                + displayedSong.notes.Count + Localize(" NOTES", " 个音符");
+                + displayedSong.notes.Count + " NOTES";
     }
 
     private void RefreshGameplayText()
     {
         if (displayedSong != null)
         {
-            SetText(songNameValue, displayedSong.LocalizedTitle(isChinese).ToUpperInvariant());
+            SetText(songNameValue, displayedSong.title.ToUpperInvariant());
         }
         SetText(operationHint, UnityEngine.XR.XRSettings.isDeviceActive
-            ? Localize("STRIKE WHEN THE RINGS MEET · A THROW\nB PAUSE · X 中文",
-                "光圈重合时挥棒 · A 投掷\nB 暂停 · X ENGLISH")
-            : Localize("MOUSE MOVE · CLICK / SPACE HIT\nT THROW · ESC PAUSE · L 中文",
-                "鼠标移棒 · 合圈时左键/空格击打\nT 投掷 · ESC 暂停 · L ENGLISH"));
+            ? "STRIKE WHEN THE RINGS MEET · A THROW\nB PAUSE"
+            : "MOUSE MOVE · CLICK / SPACE HIT\nT THROW · ESC PAUSE");
 
         if (countInValue > 0)
         {
-            SetText(phaseValue, Localize("READY  ", "准备  ") + countInValue);
+            SetText(phaseValue, "READY  " + countInValue);
         }
         else if (hasGameplaySnapshot)
         {
@@ -409,39 +391,33 @@ public sealed class WukongRhythmHud : MonoBehaviour
         }
         else
         {
-            SetText(phaseValue, Localize("PHASE 1", "阶段 1"));
+            SetText(phaseValue, "PHASE 1");
         }
     }
 
     private void RefreshResultsText()
     {
-        SetText(resultTitle, Localize("BATTLE COMPLETE", "战斗完成"));
-        SetText(resultScore, Localize("SCORE  ", "得分  ") + resultScoreValue.ToString("D6"));
-        SetText(resultAccuracy, Localize("TIMING  ", "节奏准确度  ") + resultAccuracyValue.ToString("0") + "%");
-        SetText(resultCombo, Localize("MAX COMBO  ", "最高连击  ") + resultComboValue.ToString("D3"));
-        SetText(resultBreakdown, Localize(
-            "PERFECT " + resultPerfectValue + "    GOOD " + resultGoodValue + "    MISS " + resultMissValue,
-            "完美 " + resultPerfectValue + "    良好 " + resultGoodValue + "    失误 " + resultMissValue));
+        SetText(resultTitle, "BATTLE COMPLETE");
+        SetText(resultScore, "SCORE  " + resultScoreValue.ToString("D6"));
+        SetText(resultAccuracy, "TIMING  " + resultAccuracyValue.ToString("0") + "%");
+        SetText(resultCombo, "MAX COMBO  " + resultComboValue.ToString("D3"));
+        SetText(resultBreakdown,
+            "PERFECT " + resultPerfectValue + "    GOOD " + resultGoodValue + "    MISS " + resultMissValue);
         SetText(resultHint, UnityEngine.XR.XRSettings.isDeviceActive
-            ? Localize("A REPLAY   B SELECT MUSIC\nX 中文","A 再来一局   B 选择音乐\nX ENGLISH")
-            : Localize("ENTER / T / R REPLAY   ESC MUSIC\nL 中文","Enter / T / R 重玩   Esc 选曲\nL ENGLISH"));
+            ? "A REPLAY   B SELECT MUSIC"
+            : "ENTER / T / R REPLAY   ESC MUSIC");
     }
 
     private string RatingText(WukongHudRating rating)
     {
         switch (rating)
         {
-            case WukongHudRating.Perfect: return Localize("PERFECT", "完美");
-            case WukongHudRating.Good: return Localize("GOOD", "良好");
-            case WukongHudRating.Miss: return Localize("MISS", "失误");
-            case WukongHudRating.Early: return Localize("TOO EARLY", "过早 · 等待拍点");
+            case WukongHudRating.Perfect: return "PERFECT";
+            case WukongHudRating.Good: return "GOOD";
+            case WukongHudRating.Miss: return "MISS";
+            case WukongHudRating.Early: return "TOO EARLY";
             default: return string.Empty;
         }
-    }
-
-    private string Localize(string english, string chinese)
-    {
-        return isChinese ? chinese : english;
     }
 
     private RawImage CardFor(WukongHudRating rating)

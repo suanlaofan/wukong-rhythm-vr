@@ -38,9 +38,6 @@ public sealed class WukongSongDefinition : ScriptableObject
     public string songId = "song";
     public string title = "Untitled Song";
     public string artist = "Unknown";
-    [Header("Chinese Localization")]
-    public string titleZh;
-    public string artistZh;
     public AudioClip audioClip;
     public AudioClip previewClip;
 
@@ -86,16 +83,6 @@ public sealed class WukongSongDefinition : ScriptableObject
     public float WarningTimeAtNote(WukongBeatNote note) => TimeAtBeat(note.beat - note.warningBeats);
 
     public float TimeAtNote(WukongBeatNote note) => TimeAtBeat(note.beat) + note.timingOffsetSeconds;
-
-    public string LocalizedTitle(bool chinese)
-    {
-        return chinese && !string.IsNullOrWhiteSpace(titleZh) ? titleZh : title;
-    }
-
-    public string LocalizedArtist(bool chinese)
-    {
-        return chinese && !string.IsNullOrWhiteSpace(artistZh) ? artistZh : artist;
-    }
 
     public void SortAndSanitize()
     {

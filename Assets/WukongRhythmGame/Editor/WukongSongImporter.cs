@@ -99,9 +99,7 @@ public static class WukongSongImporter
 
             song.songId = pending.assetName.ToLowerInvariant();
             song.title = EnglishTitle(pending.sourceTitle);
-            song.titleZh = ChineseTitle(pending.sourceTitle);
             song.artist = "EDM Test Collection";
-            song.artistZh = "EDM 测试曲库";
             song.audioClip = clip;
             song.previewClip = null;
             song.travelBeats = 6f;
@@ -159,13 +157,6 @@ public static class WukongSongImporter
         return sourceTitle
             .Replace("萌萌futurebass?", "Cute Future Bass")
             .Replace("萌萌Electropop", "Cute Electropop");
-    }
-
-    private static string ChineseTitle(string sourceTitle)
-    {
-        return sourceTitle
-            .Replace("萌萌futurebass?", "萌萌 Future Bass")
-            .Replace("萌萌Electropop", "萌萌 Electropop");
     }
 
     private static string MakeAssetName(string sourceTitle)

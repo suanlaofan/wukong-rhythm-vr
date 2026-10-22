@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: dnb_neurofunk_pulse
   title: DnB - Neurofunk Pulse
   artist: EDM Test Collection
-  titleZh: DnB - Neurofunk Pulse
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: d136cfb664cc04fd6a1f45d40eda775e, type: 3}
   previewClip: {fileID: 0}
   bpm: 116.5433

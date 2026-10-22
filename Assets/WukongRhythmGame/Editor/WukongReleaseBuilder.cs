@@ -8,7 +8,7 @@ using UnityEngine;
 
 public static class WukongReleaseBuilder
 {
-    public const string Version = "1.1.0";
+    public const string Version = "1.1.1";
     [MenuItem("Wukong Rhythm/Build/Build Diagnostic APK")]
     public static void BuildDiagnostic() { Build(false); }
 
@@ -28,7 +28,7 @@ public static class WukongReleaseBuilder
         WukongRhythmGameBuilder.ConfigurePicoBuildSettings();
         WukongAppIconConfigurator.Apply();
         PlayerSettings.bundleVersion = Version;
-        PlayerSettings.Android.bundleVersionCode = Math.Max(3, PlayerSettings.Android.bundleVersionCode);
+        PlayerSettings.Android.bundleVersionCode = Math.Max(4, PlayerSettings.Android.bundleVersionCode);
         EditorUserBuildSettings.development = false;
         EditorUserBuildSettings.allowDebugging = false;
         EditorUserBuildSettings.connectProfiler = false;

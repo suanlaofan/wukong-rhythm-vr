@@ -32,8 +32,8 @@ public sealed class WukongThrowPlayValidation : MonoBehaviour
         var corners=new Vector3[4];guide.contentRoot.GetWorldCorners(corners);
         Check(corners[0].x>=0 && corners[0].y>=0 && corners[2].x<=Screen.width && corners[2].y<=Screen.height,"controls fit inside the game viewport");
         foreach(WukongRhythmGame.BattleState state in Enum.GetValues(typeof(WukongRhythmGame.BattleState)))
-        foreach(bool xr in new[]{false,true})foreach(bool zh in new[]{false,true})
-            Check(!string.IsNullOrWhiteSpace(WukongControlsGuide.Bindings(state,xr,zh)),"controls mapped for "+state+" xr="+xr+" zh="+zh);
+        foreach(bool xr in new[]{false,true})
+            Check(!string.IsNullOrWhiteSpace(WukongControlsGuide.Bindings(state,xr)),"controls mapped for "+state+" xr="+xr);
         Check(Mathf.Abs(game.hud.GetComponent<WukongSpatialUi>().headRelativeOffset.y-.16f)<.001,"right panel raised 12 cm");
         if(Mouse.current!=null)
         {
@@ -70,10 +70,10 @@ public sealed class WukongThrowPlayValidation : MonoBehaviour
         game.PauseBattle();
         Check(!staff.IsThrown && staff.transform.parent==staff.handAnchor,"pause recalls an in-flight staff");
         yield return null;
-        Check(guide.bindingsLabel.text.Contains("继续")||guide.bindingsLabel.text.Contains("RESUME"),"persistent guide switches to pause controls");
+        Check(guide.bindingsLabel.text.Contains("RESUME"),"persistent guide switches to pause controls");
         Invoke(game,"ReturnToSongSelection");
         yield return null;
-        Check(guide.bindingsLabel.text.Contains("选曲")||guide.bindingsLabel.text.Contains("SELECT"),"persistent guide switches to song selection controls");
+        Check(guide.bindingsLabel.text.Contains("SELECT"),"persistent guide switches to song selection controls");
         string dir=Path.Combine(Environment.GetEnvironmentVariable("WUKONG_AUDIT_DIR")??"Logs/WukongValidation","throw-ui");
         Directory.CreateDirectory(dir);
         File.WriteAllText(Path.Combine(dir,"throw-play-validation.json"),JsonUtility.ToJson(new ValidationReport { checks=checks, utc=DateTime.UtcNow.ToString("O") },true));

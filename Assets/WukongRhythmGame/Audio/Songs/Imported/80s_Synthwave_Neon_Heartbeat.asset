@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: 80s_synthwave_neon_heartbeat
   title: 80s Synthwave - Neon Heartbeat
   artist: EDM Test Collection
-  titleZh: 80s Synthwave - Neon Heartbeat
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: 5cbd2e64721894006b574e96280a5ce1, type: 3}
   previewClip: {fileID: 0}
   bpm: 103.6834

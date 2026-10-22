@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: deep_house_midnight_drift
   title: Deep House - Midnight Drift
   artist: EDM Test Collection
-  titleZh: Deep House - Midnight Drift
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: 7444b772eca904cd4a7da7a57bea50a0, type: 3}
   previewClip: {fileID: 0}
   bpm: 120.1853

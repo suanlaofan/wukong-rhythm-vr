@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: shibuyakei_neon_heartbeat
   title: Shibuyakei - Neon Heartbeat
   artist: EDM Test Collection
-  titleZh: Shibuyakei - Neon Heartbeat
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: 6d8544047c1ed4546a56a3077debd672, type: 3}
   previewClip: {fileID: 0}
   bpm: 129.1992

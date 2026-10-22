@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: minimal_techno_hollow_pulse
   title: Minimal Techno - Hollow Pulse
   artist: EDM Test Collection
-  titleZh: Minimal Techno - Hollow Pulse
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: 702b866beadb94b92843123a359ed7ea, type: 3}
   previewClip: {fileID: 0}
   bpm: 129.1992

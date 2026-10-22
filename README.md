@@ -2,7 +2,7 @@
 
 <img src="Assets/WukongRhythmGame/UI/AppIcon/WukongAppIcon.png" width="144" alt="悟空节奏图标">
 
-使用金箍棒随音乐击打石球的 Unity / PICO VR 游戏。当前版本 **1.1.0**。
+使用金箍棒随音乐击打石球的 Unity / PICO VR 游戏。当前版本 **1.1.1**。
 
 [下载 APK 与查看发布记录](https://github.com/suanlaofan/wukong-rhythm-vr/releases/latest)
 
@@ -21,7 +21,6 @@
 | 投掷 | 右 A | 空格 | T |
 | 暂停 | 右 B | Delete（Mac 为 Fn + Delete） | Esc |
 | 暂停后返回选曲 | 长按右 B | 长按 Delete | 长按 Esc |
-| 中英切换 | 左 X | X | L |
 | 暂停时校准 | 右摇杆左右 | J / L | ← / → |
 
 模拟器底部选择 **右手柄模式**，左侧开启 **手柄按键模式**。表格中的模拟器键是默认映射；若修改过模拟器设置，以其“手柄设置”为准。游戏中的提示文字不是可点击按钮。
@@ -39,5 +38,3 @@ Unity **6000.5.4f1**；Android ARM64 / IL2CPP / Vulkan，PICO XR SDK。
 本次规则检查 7,586 项通过；已在 PICO 0.13 模拟器实测开始、暂停、继续、返回选曲以及音乐输出。此前 Unity Play Mode 已覆盖投掷、扫掠碰撞、鼠标跟随和命中音效。
 
 GitHub APK 沿用现有测试签名及应用标识，以支持覆盖升级。**Swan 真机的平台签名验收和真实性能仍待实测**；模拟器通过不能替代真机验收。全部曲谱尚未逐首完成人工听感审核。
-
-[本次修改与验证说明](Documentation/Remediation/Release-1.1.0.md)

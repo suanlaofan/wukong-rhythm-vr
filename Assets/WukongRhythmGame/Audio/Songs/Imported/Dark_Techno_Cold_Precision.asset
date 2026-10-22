@@ -15,8 +15,6 @@ MonoBehaviour:
   songId: dark_techno_cold_precision
   title: Dark Techno - Cold Precision
   artist: EDM Test Collection
-  titleZh: Dark Techno - Cold Precision
-  artistZh: "EDM \u6D4B\u8BD5\u66F2\u5E93"
   audioClip: {fileID: 8300000, guid: 588457082bef14559ad73a611280d0cf, type: 3}
   previewClip: {fileID: 0}
   bpm: 130.8347

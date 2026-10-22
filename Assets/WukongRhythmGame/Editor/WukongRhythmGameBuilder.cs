@@ -794,7 +794,7 @@ public static class WukongRhythmGameBuilder
         outline.effectColor=new Color(0f,0f,0f,.75f);
         var guide=panel.AddComponent<WukongControlsGuide>();guide.game=game;guide.bindingsLabel=bindings;
         guide.contentRoot=content;
-        bindings.text=WukongControlsGuide.Bindings(WukongRhythmGame.BattleState.SongSelect,false,true);
+        bindings.text=WukongControlsGuide.Bindings(WukongRhythmGame.BattleState.SongSelect,false);
     }
 
     private static Texture2D LoadGlassTexture(string sourceFileName, string generatedFileName)

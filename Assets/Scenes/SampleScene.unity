@@ -1622,7 +1622,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "\u2191\u2193 \u9009\u66F2   Enter \u5F00\u59CB   L \u4E2D\u82F1"
+  m_Text: "\u2191\u2193 SELECT   ENTER START"
 --- !u!222 &238115087
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -68,7 +68,6 @@ public sealed class WukongRhythmGame : MonoBehaviour
     private AudioSource musicSource;
     private AudioSource effectsSource;
     private AudioSource impactSource;
-    private UnityEngine.XR.InputDevice leftHandDevice;
     private UnityEngine.XR.InputDevice rightHandDevice;
     private WukongSongDefinition currentSong;
     private BattleState state;
@@ -89,7 +88,6 @@ public sealed class WukongRhythmGame : MonoBehaviour
     private int lastPhase;
     private bool previousPrimaryButton;
     private bool previousSecondaryButton;
-    private bool previousLanguageButton;
     private int loggedSimulatorState = -1;
     private float previousStickY;
     private Coroutine battleRoutine;
@@ -146,12 +144,7 @@ public sealed class WukongRhythmGame : MonoBehaviour
 
     private void Update()
     {
-        ReadInput(out bool primaryPressed, out bool secondaryPressed, out bool secondaryHeld, out bool languagePressed, out float stickY);
-        if (languagePressed)
-        {
-            hud?.ToggleLanguage();
-        }
-
+        ReadInput(out bool primaryPressed, out bool secondaryPressed, out bool secondaryHeld, out float stickY);
         if (state == BattleState.SongSelect)
         {
             UpdateSongSelection(primaryPressed, stickY);
@@ -725,26 +718,16 @@ public sealed class WukongRhythmGame : MonoBehaviour
         out bool primaryPressed,
         out bool secondaryPressed,
         out bool secondaryHeld,
-        out bool languagePressed,
         out float stickY)
     {
-        if (!leftHandDevice.isValid)
-        {
-            leftHandDevice = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
-        }
         if (!rightHandDevice.isValid)
         {
             rightHandDevice = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
         }
 
-        bool languageHeld = false;
         bool primaryHeld = false;
         bool secondaryHeldXr = false;
         Vector2 stick = Vector2.zero;
-        if (leftHandDevice.isValid)
-        {
-            leftHandDevice.TryGetFeatureValue(UnityEngine.XR.CommonUsages.primaryButton, out languageHeld);
-        }
         if (rightHandDevice.isValid)
         {
             rightHandDevice.TryGetFeatureValue(UnityEngine.XR.CommonUsages.primaryButton, out primaryHeld);
@@ -770,7 +753,6 @@ public sealed class WukongRhythmGame : MonoBehaviour
             {
                 primaryHeld |= pad.buttonSouth.isPressed;
                 secondaryHeldXr |= pad.buttonEast.isPressed;
-                languageHeld |= pad.buttonWest.isPressed;
                 Vector2 axis = pad.rightStick.ReadValue();
                 if (axis.sqrMagnitude < .1f) axis = pad.dpad.ReadValue();
                 if (axis.sqrMagnitude > stick.sqrMagnitude) stick = axis;
@@ -782,20 +764,16 @@ public sealed class WukongRhythmGame : MonoBehaviour
                 || Keyboard.current.tKey.wasPressedThisFrame);
         bool keyboardSecondaryPressed = Keyboard.current != null && (Keyboard.current.escapeKey.wasPressedThisFrame);
         bool keyboardSecondaryHeld = Keyboard.current != null && (Keyboard.current.escapeKey.isPressed);
-        bool keyboardLanguage = Keyboard.current != null && (Keyboard.current.lKey.wasPressedThisFrame
-            || (simulator && Keyboard.current.xKey.wasPressedThisFrame));
         primaryPressed = (primaryHeld && !previousPrimaryButton) || keyboardPrimary;
         secondaryPressed = (secondaryHeldXr && !previousSecondaryButton) || keyboardSecondaryPressed;
         secondaryHeld = secondaryHeldXr || keyboardSecondaryHeld;
-        languagePressed = (languageHeld && !previousLanguageButton) || keyboardLanguage;
         stickY = stick.y;
         inputStickX = stick.x;
         previousPrimaryButton = primaryHeld;
         previousSecondaryButton = secondaryHeldXr;
-        previousLanguageButton = languageHeld;
-        if (simulator && (primaryPressed || secondaryPressed || languagePressed))
+        if (simulator && (primaryPressed || secondaryPressed))
             Debug.Log("WUKONG_INPUT state=" + state + " primary=" + primaryPressed + " secondary=" + secondaryPressed
-                + " language=" + languagePressed + " focus=" + hasFocus + " present=" + IsUserPresent());
+                + " focus=" + hasFocus + " present=" + IsUserPresent());
     }
 
     private void TryMonsterAnimation(string stateName, float transition)
